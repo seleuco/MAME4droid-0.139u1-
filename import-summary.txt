@@ -1,0 +1,87 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+* build.sh
+* dropped text.txt
+* files (copy).zip
+* libs (copy)\
+* libs (copy)\arm64-v8a\
+* libs (copy)\arm64-v8a\libMAME4droid.so
+* libs (copy)\arm64-v8a\libmame4droid-jni.so
+* libs (copy)\armeabi-v7a\
+* libs (copy)\armeabi-v7a\libMAME4droid.so
+* libs (copy)\armeabi-v7a\libmame4droid-jni.so
+* libs (copy)\armeabi\
+* libs (copy)\armeabi\libMAME4droid.so
+* libs (copy)\armeabi\libmame4droid-jni.so
+* libs (copy)\mips64\
+* libs (copy)\mips64\libmame4droid-jni.so
+* libs (copy)\mips\
+* libs (copy)\mips\libMAME4droid.so
+* libs (copy)\mips\libmame4droid-jni.so
+* libs (copy)\x86\
+* libs (copy)\x86\libMAME4droid.so
+* libs (copy)\x86\libmame4droid-jni.so
+* libs (copy)\x86_64\
+* libs (copy)\x86_64\libmame4droid-jni.so
+* libs 1.9.1\
+* libs 1.9.1\arm64-v8a\
+* libs 1.9.1\arm64-v8a\libMAME4droid.so
+* libs 1.9.1\arm64-v8a\libmame4droid-jni.so
+* libs 1.9.1\armeabi-v7a\
+* libs 1.9.1\armeabi-v7a\libMAME4droid.so
+* libs 1.9.1\armeabi-v7a\libmame4droid-jni.so
+* libs 1.9.1\mips\
+* libs 1.9.1\mips\libMAME4droid.so
+* libs 1.9.1\mips\libmame4droid-jni.so
+* libs 1.9.1\x86\
+* libs 1.9.1\x86\libMAME4droid.so
+* libs 1.9.1\x86\libmame4droid-jni.so
+* libs 1.9.3\
+* libs 1.9.3\arm64-v8a\
+* libs 1.9.3\arm64-v8a\libMAME4droid.so
+* libs 1.9.3\arm64-v8a\libmame4droid-jni.so
+* libs 1.9.3\armeabi-v7a\
+* libs 1.9.3\armeabi-v7a\libMAME4droid.so
+* libs 1.9.3\armeabi-v7a\libmame4droid-jni.so
+* libs 1.9.3\mips\
+* libs 1.9.3\mips\libMAME4droid.so
+* libs 1.9.3\mips\libmame4droid-jni.so
+* libs 1.9.3\x86\
+* libs 1.9.3\x86\libMAME4droid.so
+* libs 1.9.3\x86\libmame4droid-jni.so
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+* AndroidManifest.xml => app\src\main\AndroidManifest.xml
+* assets\ => app\src\main\assets
+* jni\ => app\src\main\jni\
+* libs\arm64-v8a\libMAME4droid.so => app\src\main\jniLibs\arm64-v8a\libMAME4droid.so
+* libs\armeabi-v7a\libMAME4droid.so => app\src\main\jniLibs\armeabi-v7a\libMAME4droid.so
+* lint.xml => app\lint.xml
+* res\ => app\src\main\res\
+* src\ => app\src\main\java\
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

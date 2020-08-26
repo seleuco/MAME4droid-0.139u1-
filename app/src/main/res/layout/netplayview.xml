@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id= "@+id/netplay_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+<LinearLayout
+    android:id="@+id/netplay_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp"  
+    android:visibility="visible" >
+
+    <Button
+        android:id="@+id/StartGameBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"            
+        android:text="@string/start_game" />
+    <Button
+        android:id="@+id/JoinPeerGameBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"              
+        android:text="@string/join_peer_game" />
+    <Button
+        android:id="@+id/DisconnectBtn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"        
+        android:enabled="false"     
+        android:text="@string/disconnect" />
+    
+</LinearLayout>
+
+</ScrollView>
