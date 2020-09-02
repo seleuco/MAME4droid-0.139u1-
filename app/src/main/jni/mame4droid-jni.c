@@ -247,7 +247,7 @@ void myJNI_dumpAudio2(void *buffer, int size)
        audioBuffer = (jobject)(*env)->NewGlobalRef(env, tmp);
     }
     
-    memcpy(audioByteBuffer,buffer,size);
+    memcpy(audioByteBuffer, buffer, (size_t) size);
 
     (*env)->CallStaticVoidMethod(env, cEmulator, android_dumpAudio, audioBuffer,(jint)size);
 
