@@ -13,7 +13,7 @@ android {
         setProperty("archivesBaseName", "MAME4droid 0.139u1-$versionName")
         ndk {
             moduleName "mame4droid-jni"
-            abiFilters "arm64-v8a"
+            abiFilters "armeabi-v7a", "arm64-v8a"
         }
     }
 
