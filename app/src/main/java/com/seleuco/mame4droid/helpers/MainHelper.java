@@ -650,17 +650,44 @@ public class MainHelper {
 
 				if (h == 0)
 					h = 1;
+/*
+https://stackoverflow.com/questions/7199492/what-are-the-aspect-ratios-for-all-android-phone-and-tablet-devices
 
-				// System.out.println("--->>> "+w+" "+h+ " "+w/h+ " "+
-				// (float)(16.0/9.0));
+oneplus 6      --> 2280x1080 19:9   6.28
+oneplus 7      --> 2340x1080 19.5:9 6.21
+oneplus 8 	   --> 2400x1080 20.9   6.55
+oneplus 8 pro  --> 3168x1440 19.8:9 6.78
+galaxy sde	   --> 2560x1600 16:10
 
-				if (w / h != (float) (16.0 / 9.0) /* && false */) {
+19.8:9 -> 2.2
+20/9   -> 2,22222
+19.5:9 -> 2,16666
+19/9  -> 2,11111
+16/9   -> 1,7
+4/3    -> 1,3
+ */
+				// System.out.println("--->>> "+w+" "+h+ " "+w/h+ " "+ (float)(16.0/9.0));
+				float ar = w / h;
+				if ( ar >= (float) (16.0 / 9.0)) {
+					System.out.println("--->>> ULTRA WIDE");
+					inputHandler.readControllerValues(R.raw.controller_landscape_19_9);
+				} else if ( ar >=  (float) (16.0 / 9.0) && ar < (float) (16.0 / 9.0)){
+					System.out.println("--->>> WIDE");
+					inputHandler.readControllerValues(R.raw.controller_landscape_16_9);
+				}
+				else {
+					System.out.println("--->>> NORMAL");
+					inputHandler.readControllerValues(R.raw.controller_landscape);
+				}
+				/*
+				if (w / h != (float) (16.0 / 9.0)) {
 					inputHandler
 							.readControllerValues(R.raw.controller_landscape);
 				} else {
 					inputHandler
 							.readControllerValues(R.raw.controller_landscape_16_9);
 				}
+				*/
 			}
 		}
 
