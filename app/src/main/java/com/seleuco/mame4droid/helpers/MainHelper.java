@@ -668,10 +668,10 @@ galaxy sde	   --> 2560x1600 16:10
  */
 				// System.out.println("--->>> "+w+" "+h+ " "+w/h+ " "+ (float)(16.0/9.0));
 				float ar = w / h;
-				if ( ar >= (float) (16.0 / 9.0)) {
+				if ( ar >= (float) (19.0 / 9.0)) {
 					System.out.println("--->>> ULTRA WIDE");
 					inputHandler.readControllerValues(R.raw.controller_landscape_19_9);
-				} else if ( ar >=  (float) (16.0 / 9.0) && ar < (float) (16.0 / 9.0)){
+				} else if ( ar >=  (float) (16.0 / 9.0) && ar < (float) (19.0 / 9.0)){
 					System.out.println("--->>> WIDE");
 					inputHandler.readControllerValues(R.raw.controller_landscape_16_9);
 				}
@@ -679,15 +679,6 @@ galaxy sde	   --> 2560x1600 16:10
 					System.out.println("--->>> NORMAL");
 					inputHandler.readControllerValues(R.raw.controller_landscape);
 				}
-				/*
-				if (w / h != (float) (16.0 / 9.0)) {
-					inputHandler
-							.readControllerValues(R.raw.controller_landscape);
-				} else {
-					inputHandler
-							.readControllerValues(R.raw.controller_landscape_16_9);
-				}
-				*/
 			}
 		}
 
