@@ -112,6 +112,10 @@ public class AnalogStick implements IController{
 			stick_images[InputHandler.STICK_UP_RIGHT] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_up_right);
 		}
 	}
+
+	public int getMotionPid() {
+		return motion_pid;
+	}
 	
 	public void setStickArea(Rect rStickArea) {
 		 this.rStickArea = rStickArea;

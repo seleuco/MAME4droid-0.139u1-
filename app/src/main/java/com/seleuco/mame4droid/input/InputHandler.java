@@ -778,6 +778,9 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 						
 			int x = (int) event.getX(i);
 			int y = (int) event.getY(i);
+
+			if(actionPointerId == getAnalogStick().getMotionPid())
+				continue;
 			
 			if(actionEvent == MotionEvent.ACTION_UP 
 			   || (actionEvent == MotionEvent.ACTION_POINTER_UP && actionPointerId==pid) 
@@ -816,6 +819,7 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 							     
 								if(iv.getType() == TYPE_BUTTON_RECT && b)
 								{
+
 									 if((iv.getValue()==BTN_COIN || iv.getValue()==BTN_EXIT) && stick_state != STICK_NONE &&
 									    mm.getMainHelper().getscrOrientation() == Configuration.ORIENTATION_PORTRAIT &&
 									   !tiltSensor.isEnabled()
