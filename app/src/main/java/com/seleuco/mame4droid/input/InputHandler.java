@@ -71,7 +71,7 @@ import com.seleuco.mame4droid.helpers.DialogHelper;
 import com.seleuco.mame4droid.helpers.PrefsHelper;
 
 public class InputHandler implements OnTouchListener, OnKeyListener, IController{
-	
+
 	protected AnalogStick stick = new AnalogStick();
 	protected  TiltSensor tiltSensor = new TiltSensor();
 	protected ControlCustomizer controlCustomizer = new ControlCustomizer();
@@ -83,6 +83,8 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 	public ControlCustomizer getControlCustomizer() {
 		return controlCustomizer;
 	}
+
+	final byte vibrate_time = 1;//16;
 
 	protected static final int[] emulatorInputValues = {
 		UP_VALUE,
@@ -595,7 +597,7 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 						try
 						{
 							Vibrator v = (Vibrator) mm.getSystemService(Context.VIBRATOR_SERVICE);
-							if(v!=null)v.vibrate(15);
+							if(v!=null)v.vibrate(vibrate_time);
 						}
 						catch(Exception e){}
 					}
@@ -619,7 +621,7 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 						try
 						{
 							Vibrator v = (Vibrator) mm.getSystemService(Context.VIBRATOR_SERVICE);
-							if(v!=null)v.vibrate(15);
+							if(v!=null)v.vibrate(vibrate_time);
 						}
 						catch(Exception e){}
 					}
@@ -813,20 +815,28 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 					    		 iv.getValue()==BTN_EXIT || iv.getValue()==BTN_OPTION || iv.getValue()==BTN_COIN || iv.getValue()==BTN_START; 
 							     
 								if(iv.getType() == TYPE_BUTTON_RECT && b)
-								{									    		 
+								{
+									 if((iv.getValue()==BTN_COIN || iv.getValue()==BTN_EXIT) && stick_state != STICK_NONE &&
+									    mm.getMainHelper().getscrOrientation() == Configuration.ORIENTATION_PORTRAIT &&
+									   !tiltSensor.isEnabled()
+									 )
+									 	continue;
+
 									 newtouches[id] |= getButtonValue(iv.getValue(),true);
+
 									 if(iv.getValue()==BTN_EXIT && actionEvent!=MotionEvent.ACTION_MOVE)
-									 { 
-									    if(Emulator.isInMenu())
-									    {
-						    		        Emulator.setValue(Emulator.EXIT_GAME_KEY, 1);		    	
-					    			    	try {Thread.sleep(100);} catch (InterruptedException e) {}
-					    					Emulator.setValue(Emulator.EXIT_GAME_KEY, 0);									    	
-									    }										 
-									    else if(!Emulator.isInMAME())
-										    mm.showDialog(DialogHelper.DIALOG_EXIT);
-									    else
-									        mm.showDialog(DialogHelper.DIALOG_EXIT_GAME);
+									 {
+											if (Emulator.isInMenu()) {
+												Emulator.setValue(Emulator.EXIT_GAME_KEY, 1);
+												try {
+													Thread.sleep(100);
+												} catch (InterruptedException e) {
+												}
+												Emulator.setValue(Emulator.EXIT_GAME_KEY, 0);
+											} else if (!Emulator.isInMAME())
+												mm.showDialog(DialogHelper.DIALOG_EXIT);
+											else
+												mm.showDialog(DialogHelper.DIALOG_EXIT_GAME);
 									 } 
 									 else if(iv.getValue()==BTN_OPTION)
 									 {

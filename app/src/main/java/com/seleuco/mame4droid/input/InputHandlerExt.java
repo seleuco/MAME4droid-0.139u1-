@@ -302,8 +302,12 @@ public class InputHandlerExt extends InputHandler implements OnGenericMotionList
 		
 		int dev = getDevice(event.getDevice(),false);
 
-		int iDeviceId = getGamePadId(event.getDevice());
-		if(dev == -1) {
+		int iDeviceId = 0;
+		try {
+			iDeviceId = getGamePadId(event.getDevice());
+		}catch(Exception e){}
+
+		if(dev == -1) { //no autodetectado
 			for(int i = 0; i < MAX_DEVICES ;i++) {
 				if(iDeviceId ==  getDeviceIdFromKeyCodeWithDeviceID(keyMapping[i * emulatorInputValues.length])) // select each devices input settings first item UP_VALUE dpad setting not applicable seperate
 				{
