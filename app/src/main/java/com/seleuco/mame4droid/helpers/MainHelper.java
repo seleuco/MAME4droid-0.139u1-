@@ -319,7 +319,7 @@ public class MainHelper {
 					.getPrefsHelper().getROMsDIR() : dir + "roms";
 			mm.getDialogHelper()
 					.setInfoMsg(
-							"Created: '"
+							"Created or updated: '"
 									+ dir
 									+ "' to store save states, cfg files and MAME assets.\n\nBeware, copy or move your zipped ROMs under '"
 									+ rompath
@@ -764,15 +764,6 @@ galaxy sde	   --> 2560x1600 16:10
 		emuView.invalidate();
 	}
 
-	public void showWeb() {
-		Intent browserIntent = new Intent(
-				"android.intent.action.VIEW",
-				Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=seleuco%2enicator%40gmail%2ecom&lc=US&item_name=Seleuco%20Nicator&item_number=ixxxx4all&no_note=0&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest")
-		// Uri.parse("http://code.google.com/p/xpectrum/")
-		);
-		mm.startActivity(browserIntent);
-	}
-
 	public void showSettings() {
 		if(!Emulator.isEmulating())return;
 		Intent i = new Intent(mm, UserPreferences.class);
@@ -786,7 +777,8 @@ galaxy sde	   --> 2560x1600 16:10
 			mm.getDialogHelper()
 					.setInfoMsg(
 							"When MAME4droid is first run, it will create a folder structure for you on the internal memory of your Android device. This folder contains all the other folders MAME uses as well as some basic configuration files."
-									+ "Since MAME4droid does not come with game ROM files, you will need to copy them to the /sdcard/MAME4droid/roms (if apply) folder yourself. These should be properly named, ZIPped MAME v1.39u1 ROMs files with the filenames in all lower case.\n\n"
+									+ "Since MAME4droid does not come with game ROM files, you will need to copy them to the '/sdcard/MAME4droid/roms' or 'Android/data/com.seleuco.mame4droid/files/roms' folder (" +
+									"the one that applies) yourself. These should be properly named, ZIPped MAME v1.39u1 ROMs files with the filenames in all lower case.\n\n Important: You should define or map your Android TV game controller on 'options/settings/input/External controller/define Keys' to avoid this help screen constantly showing if the controller is not auto detected.\n\n"
 									+ "Controls: Buttons A,B,C,D,E,F on the controller map to buttons Button MAME 1 to 6 buttons."
 									+ "Coin button inserts coin/adds credit.START button starts 1P game.START+UP starts 2P game. START+RIGHT starts 3P game. START+DOWN starts 4P game.SELECT+UP inserts 2P credits. SELECT+RIGHT inserts 3P credits. SELECT+DOWN inserts 4P credits."
 									+ "R1 + START loads a save state. L1 + START saves a save state. START + SELECT when gaming accesses the game's MAME menu (dip switches, etc)...");
@@ -801,7 +793,8 @@ galaxy sde	   --> 2560x1600 16:10
 			mm.getDialogHelper()
 			.setInfoMsg(
 					"When MAME4droid is first run, it will create a folder structure for you on the internal memory of your Android device. This folder contains all the other folders MAME uses as well as some basic configuration files."
-							+ "Since MAME4droid does not come with game ROM files, you will need to copy them to the /sdcard/MAME4droid/roms (if apply) folder yourself. These should be properly named, ZIPped MAME v1.39u1 ROMs files with the filenames in all lower case.\n\n"
+							+ "Since MAME4droid does not come with game ROM files, you will need to copy them to the '/sdcard/MAME4droid/roms' or 'Android/data/com.seleuco.mame4droid/files/roms' folder (" +
+							"the one that applies) yourself. These should be properly named, ZIPped MAME v1.39u1 ROMs files with the filenames in all lower case.\n\n"
 							+ "Controls: Buttons A,B,C,D,E,F on the controller map to buttons Button MAME 1 to 6 buttons."
 							+ "Coin button inserts coin/adds credit.START button starts 1P game.START+UP starts 2P game. START+RIGHT starts 3P game. START+DOWN starts 4P game.SELECT+UP inserts 2P credits. SELECT+RIGHT inserts 3P credits. SELECT+DOWN inserts 4P credits."
 							+ "R1 + START loads a save state. L1 + START saves a save state. START + SELECT when gaming accesses the game's MAME menu (dip switches, etc)...");

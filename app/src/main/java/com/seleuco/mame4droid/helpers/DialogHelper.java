@@ -64,7 +64,6 @@ public class DialogHelper {
 	public final static int DIALOG_INFO = 3;
 	public final static int DIALOG_EXIT_GAME = 4;
 	public final static int DIALOG_OPTIONS = 5;
-	public final static int DIALOG_THANKS = 6;
 	public final static int DIALOG_FULLSCREEN = 7;
 	public final static int DIALOG_LOAD_FILE_EXPLORER = 8;
 	public final static int DIALOG_ROMs_DIR = 9;
@@ -161,13 +160,13 @@ public class DialogHelper {
 					"Since Android 10 Google has added scoped storage."+
 					"That means applications can no longer read anywhere on the SD card, only in their own directories.\n\n"+
 					"There is a compatibility flag that allows applications to work as they did before, but it can stop working at any time.\n\n" +
-					"That is why now the application will create the roms directory within 'Android/data/com.seleuco.mame4droid/files'.\n\n"+
+					"That is why now the application will install files and create the roms directory within '/sdcard/Android/data/com.seleuco.mame4droid/files' instead old '/sdcard/MAME4droid/' path.\n\n"+
 					"This has the disadvantage that when you uninstall the application, all files, such as roms or save states, will be deleted.\n"+
 					"However, as long as it works, you can continue to use the old way.\n\n"+
 					"which one do you want?"
 			)
 					.setCancelable(false)
-					.setPositiveButton("New Way (recommended)", new DialogInterface.OnClickListener() {
+					.setPositiveButton("New Way (Recommended)", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 							DialogHelper.savedDialog = DIALOG_NONE;
 							mm.removeDialog(DIALOG_NEW_ROMs_DIR);
@@ -321,19 +320,6 @@ public class DialogHelper {
 			});
 	    	dialog = builder.create();
 	        break;
-	    case DIALOG_THANKS:
-	    	builder.setMessage("I am releasing everything for free, in keeping with the licensing MAME terms, which is free for non-commercial use only. This is strictly something I made because I wanted to play with it and have the skills to make it so. That said, if you are thinking on ways to support my development I suggest you to check my support page of other free works for the community.")
-	    	       .setCancelable(false)
-	    	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-	    	           public void onClick(DialogInterface dialog, int id) {
-	     	        	   DialogHelper.savedDialog = DIALOG_NONE;
-	    	        	   mm.getMainHelper().showWeb();
-	     	        	   mm.removeDialog(DIALOG_THANKS);
-	    	           }
-	    	       });
-
-	    	 dialog = builder.create();
-	         break;   
 	    case DIALOG_EMU_RESTART: 	
 	    	builder.setTitle("Restart needed!")
 	    	       .setMessage("MAME4droid needs to restart for the changes to take effect.")
@@ -381,11 +367,6 @@ public class DialogHelper {
 	    	Emulator.pause();
 	        DialogHelper.savedDialog = DIALOG_INFO;
 		}
-	    else if(id==DIALOG_THANKS)
-		{
-	    	Emulator.pause();
-	        DialogHelper.savedDialog = DIALOG_THANKS;
-		}		
 	    else if(id==DIALOG_EXIT)
 		{
 	    	Emulator.pause();

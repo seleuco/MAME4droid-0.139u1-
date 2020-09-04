@@ -227,7 +227,7 @@ public class MAME4droid extends Activity {
 			if(prefsHelper.getROMsDIR()==null)
 			{	            
 				if(DialogHelper.savedDialog==DialogHelper.DIALOG_NONE)
-					if (Build.VERSION.SDK_INT >= 29)
+					if (Build.VERSION.SDK_INT >= 29 && getPrefsHelper().getInstallationDIR() == null)
 						showDialog(DialogHelper.DIALOG_NEW_ROMs_DIR);
 					else
 				        showDialog(DialogHelper.DIALOG_ROMs_DIR);
