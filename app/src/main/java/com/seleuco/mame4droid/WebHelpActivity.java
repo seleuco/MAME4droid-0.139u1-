@@ -75,7 +75,9 @@ public class WebHelpActivity extends Activity {
         if(!path.endsWith("/"))
         	path+="/";
         
-        lWebView.loadUrl("file:///" +  path +"help/index.htm");		
+        //lWebView.loadUrl("file:///" +  path +"help/index.htm");
+        lWebView.loadUrl("file:///android_asset/index.htm");
+
         lWebView.requestFocus();        
 	}
 	

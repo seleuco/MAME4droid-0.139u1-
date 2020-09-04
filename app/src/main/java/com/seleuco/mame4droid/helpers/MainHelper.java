@@ -784,12 +784,13 @@ galaxy sde	   --> 2560x1600 16:10
 									+ "R1 + START loads a save state. L1 + START saves a save state. START + SELECT when gaming accesses the game's MAME menu (dip switches, etc)...");
 			mm.showDialog(DialogHelper.DIALOG_INFO);
 		} else {
-			/*
+
 			Intent i = new Intent(mm, WebHelpActivity.class);
 			i.putExtra("INSTALLATION_PATH", mm.getMainHelper()
 					.getInstallationDIR());
 			mm.startActivityForResult(i, MainHelper.SUBACTIVITY_HELP);
-			*/
+
+			/*
 			mm.getDialogHelper()
 			.setInfoMsg(
 					"When MAME4droid is first run, it will create a folder structure for you on the internal memory of your Android device. This folder contains all the other folders MAME uses as well as some basic configuration files."
@@ -798,7 +799,8 @@ galaxy sde	   --> 2560x1600 16:10
 							+ "Controls: Buttons A,B,C,D,E,F on the controller map to buttons Button MAME 1 to 6 buttons."
 							+ "Coin button inserts coin/adds credit.START button starts 1P game.START+UP starts 2P game. START+RIGHT starts 3P game. START+DOWN starts 4P game.SELECT+UP inserts 2P credits. SELECT+RIGHT inserts 3P credits. SELECT+DOWN inserts 4P credits."
 							+ "R1 + START loads a save state. L1 + START saves a save state. START + SELECT when gaming accesses the game's MAME menu (dip switches, etc)...");
-	         mm.showDialog(DialogHelper.DIALOG_INFO);			
+	         mm.showDialog(DialogHelper.DIALOG_INFO);
+	         */
 		}
 	}
 
