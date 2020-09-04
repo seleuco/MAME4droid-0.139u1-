@@ -227,7 +227,10 @@ public class MAME4droid extends Activity {
 			if(prefsHelper.getROMsDIR()==null)
 			{	            
 				if(DialogHelper.savedDialog==DialogHelper.DIALOG_NONE)
-				   showDialog(DialogHelper.DIALOG_ROMs_DIR);                      
+					if (Build.VERSION.SDK_INT >= 29)
+						showDialog(DialogHelper.DIALOG_NEW_ROMs_DIR);
+					else
+				        showDialog(DialogHelper.DIALOG_ROMs_DIR);
 			}
 			else
 			{
@@ -517,10 +520,13 @@ public class MAME4droid extends Activity {
 	        case 1:
 	        	if(grantResults == null || grantResults.length==0)
 	        	{
-	        		this.showDialog(DialogHelper.DIALOG_NO_PERMISSIONS);
+	        		//this.showDialog(DialogHelper.DIALOG_NO_PERMISSIONS);
+	        		System.out.println("***1");
 	        	} else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					System.out.println("***2");
 	            	initMame4droid();
 	            } else {
+					System.out.println("***3");
 	            	this.showDialog(DialogHelper.DIALOG_NO_PERMISSIONS);
 	            }
 	            break;

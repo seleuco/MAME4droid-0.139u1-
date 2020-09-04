@@ -102,6 +102,14 @@ public class MainHelper {
 	final public static int DEVICE_AGAMEPAD2 = 5;
 	final public static int DEVICE_ANDROIDTV = 5;
 
+	final public static int INSTALLATION_DIR_UNDEFINED= 1;
+	final public static int INSTALLATION_DIR_NEW= 2;
+	final public static int INSTALLATION_DIR_OLD = 3;
+
+	protected int installationDirType = INSTALLATION_DIR_UNDEFINED;
+
+	protected boolean createdInstallationDir = false;
+
 	protected int deviceDetected = DEVICE_GENEREIC;
 
 	protected int oldInMAME = 0;
@@ -114,6 +122,18 @@ public class MainHelper {
 
 	public MainHelper(MAME4droid value) {
 		mm = value;
+	}
+
+	public void setInstallationDirType(int installationDirType) {
+		this.installationDirType = installationDirType;
+	}
+
+	public int getInstallationDirType() {
+		return installationDirType;
+	}
+
+	public boolean isCreatedInstallationDir() {
+		return createdInstallationDir;
 	}
 
 	public String getLibDir() {
@@ -138,10 +158,13 @@ public class MainHelper {
 		// android.os.Debug.waitForDebugger();
 		String state = Environment.getExternalStorageState();
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			res_dir = Environment.getExternalStorageDirectory()
+			if(installationDirType == INSTALLATION_DIR_NEW)
+				res_dir = mm.getExternalFilesDir(null).getAbsolutePath()+"/" ;
+			else
+				res_dir = Environment.getExternalStorageDirectory()
 					.getAbsolutePath() + "/MAME4droid/";
 		} else
-			res_dir = mm.getFilesDir().getAbsolutePath() + "/MAME4droid/";
+			res_dir = mm.getFilesDir().getAbsolutePath()+"/";
 
 		// res_dir =
 		// mm.getExternalFilesDir(null).getAbsolutePath()+"/MAME4droid/";
@@ -183,9 +206,14 @@ public class MainHelper {
 								+ "' Is it writeable?.\nReverting...");
 				mm.showDialog(DialogHelper.DIALOG_ERROR_WRITING);
 				return false;
+			} else {
+				created = true;
 			}
 		}
 
+		createdInstallationDir = created;
+
+		/*
 		if (created) {
 			String rompath = mm.getPrefsHelper().getROMsDIR() != null ? mm
 					.getPrefsHelper().getROMsDIR() : dir + "roms";
@@ -198,6 +226,7 @@ public class MainHelper {
 									+ "' directory!\n\nMAME4droid 0.139 uses only 0.139 MAME romset.\n\nYou may have to completely turn off your device to see new folders. You might need to unplug also.");
 			mm.showDialog(DialogHelper.DIALOG_INFO);
 		}
+		*/
 
 		mm.getPrefsHelper().setOldInstallationDIR(dir);
 
@@ -284,6 +313,19 @@ public class MainHelper {
 
 			}
 			zis.close();
+
+			String dir = this.getInstallationDIR();
+			String rompath = mm.getPrefsHelper().getROMsDIR() != null &&  mm.getPrefsHelper().getROMsDIR()!="" ? mm
+					.getPrefsHelper().getROMsDIR() : dir + "roms";
+			mm.getDialogHelper()
+					.setInfoMsg(
+							"Created: '"
+									+ dir
+									+ "' to store save states, cfg files and MAME assets.\n\nBeware, copy or move your zipped ROMs under '"
+									+ rompath
+									+ "' directory!\n\nMAME4droid 0.139 uses only 0.139 MAME romset.");
+			mm.showDialog(DialogHelper.DIALOG_INFO);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

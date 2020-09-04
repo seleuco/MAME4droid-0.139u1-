@@ -71,6 +71,7 @@ public class DialogHelper {
 	public final static int DIALOG_FINISH_CUSTOM_LAYOUT = 10;
 	public final static int DIALOG_EMU_RESTART = 11;
 	public final static int DIALOG_NO_PERMISSIONS = 12;
+	public final static int DIALOG_NEW_ROMs_DIR = 13;
 	
 	protected MAME4droid mm = null;
 	
@@ -137,6 +138,7 @@ public class DialogHelper {
 	    	           public void onClick(DialogInterface dialog, int id) {
 	    	        	   DialogHelper.savedDialog = DIALOG_NONE;
 	    	        	   mm.removeDialog(DIALOG_ROMs_DIR);
+						   mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_OLD);
 	    	        	   if(mm.getMainHelper().ensureInstallationDIR(mm.getMainHelper().getInstallationDIR()))
 	    	        	   {	    	
 	    	        		  mm.getPrefsHelper().setROMsDIR("");
@@ -152,7 +154,40 @@ public class DialogHelper {
 	    	           }
 	    	       });
 	    	dialog = builder.create();
-	        break;	    
+	        break;
+	    case DIALOG_NEW_ROMs_DIR:
+
+			builder.setMessage(
+					"Since Android 10 Google has added scoped storage."+
+					"That means applications can no longer read anywhere on the SD card, only in their own directories.\n\n"+
+					"There is a compatibility flag that allows applications to work as they did before, but it can stop working at any time.\n\n" +
+					"That is why now the application will create the roms directory within 'Android/data/com.seleuco.mame4droid/files'.\n\n"+
+					"This has the disadvantage that when you uninstall the application, all files, such as roms or save states, will be deleted.\n"+
+					"However, as long as it works, you can continue to use the old way.\n\n"+
+					"which one do you want?"
+			)
+					.setCancelable(false)
+					.setPositiveButton("New Way (recommended)", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+							DialogHelper.savedDialog = DIALOG_NONE;
+							mm.removeDialog(DIALOG_NEW_ROMs_DIR);
+							mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_NEW);
+							if(mm.getMainHelper().ensureInstallationDIR(mm.getMainHelper().getInstallationDIR()))
+							{
+								mm.getPrefsHelper().setROMsDIR("");
+								mm.runMAME4droid();
+							}
+						}
+						})
+					.setNegativeButton("Old Way", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								DialogHelper.savedDialog = DIALOG_NONE;
+								mm.removeDialog(DIALOG_NEW_ROMs_DIR);
+								mm.showDialog(DialogHelper.DIALOG_ROMs_DIR);
+							}
+						});
+			dialog = builder.create();
+			break;
 	    case DIALOG_EXIT:
 	    	
 	    	builder.setMessage("Are you sure you want to exit?")
@@ -374,6 +409,10 @@ public class DialogHelper {
 	    else if(id==DIALOG_ROMs_DIR)
 		{
 	    	DialogHelper.savedDialog = DIALOG_ROMs_DIR;
+		}
+		else if(id==DIALOG_NEW_ROMs_DIR)
+		{
+			DialogHelper.savedDialog = DIALOG_NEW_ROMs_DIR;
 		}
 	    else if(id==DIALOG_LOAD_FILE_EXPLORER)
 		{
