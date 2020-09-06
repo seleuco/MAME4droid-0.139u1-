@@ -49,6 +49,7 @@ import java.nio.ByteBuffer;
 
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -673,13 +674,27 @@ public class Emulator
 			    if(action == Intent.ACTION_VIEW)
 			    {
 			    	  //android.os.Debug.waitForDebugger();
-			      	  Uri uri = intent.getData();
-			      	  System.out.println("URI: "+uri.toString());
-			          java.io.File f = new java.io.File(uri.getPath());
+			      	  Uri _uri = intent.getData();
+			      	  System.out.println("URI: "+_uri.toString());
+
+			      	  String filePath = null;
+					  Log.d("","URI = "+ _uri);
+					  if (_uri != null && "content".equals(_uri.getScheme())) {
+						Cursor cursor = mm.getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
+						cursor.moveToFirst();
+						filePath = cursor.getString(0);
+						cursor.close();
+					  } else {
+						filePath = _uri.getPath();
+					  }
+
+			          java.io.File f = new java.io.File(filePath);
 			          final String name = f.getName();
 			          String path = f.getAbsolutePath().substring(0,f.getAbsolutePath().lastIndexOf(File.separator));
 			          Emulator.setValueStr(Emulator.ROM_NAME, name);
-			          Emulator.setValueStr(Emulator.ROM_PATH, path);	
+			          Emulator.setValueStr(Emulator.ROM_PATH, path);
+			          System.out.println("XX name: "+name);
+					  System.out.println("XX path: "+path);
 			          extROM = true;
 					  mm.runOnUiThread(new Runnable() {																							
 						    public void run() {
