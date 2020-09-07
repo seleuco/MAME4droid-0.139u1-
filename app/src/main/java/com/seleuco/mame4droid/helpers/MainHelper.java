@@ -315,6 +315,7 @@ public class MainHelper {
 			zis.close();
 
 			String dir = this.getInstallationDIR();
+			if(!dir.endsWith("/"))dir+="/";
 			String rompath = mm.getPrefsHelper().getROMsDIR() != null &&  mm.getPrefsHelper().getROMsDIR()!="" ? mm
 					.getPrefsHelper().getROMsDIR() : dir + "roms";
 			mm.getDialogHelper()

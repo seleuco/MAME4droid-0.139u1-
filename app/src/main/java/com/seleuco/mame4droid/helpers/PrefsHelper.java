@@ -62,6 +62,8 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener
 	final static public String PREF_ROMsDIR = "PREF_ROMsDIR_2";
 	final static public String PREF_INSTALLATION_DIR = "PREF_INSTALLATION_DIR";
 	final static public String PREF_OLD_INSTALLATION_DIR = "PREF_OLD_INSTALLATION_DIR";
+
+	final static public String PREF_OLD_INSTALLATION = "PREF_OLD_INSTALLATION";
 	
 	final static public String PREF_GLOBAL_VIDEO_RENDER_MODE = "PREF_GLOBAL_VIDEO_RENDER_MODE_2";
 	final static public String PREF_GLOBAL_AUTORES = "PREF_GLOBAL_AUTORES";
@@ -527,8 +529,19 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener
 		SharedPreferences.Editor editor =  getSharedPreferences().edit();
 		editor.putString(PREF_OLD_INSTALLATION_DIR, value);
 		editor.commit();
-	}	
-	
+	}
+
+	public Boolean istOldInstallation(){
+		return getSharedPreferences().getBoolean(PREF_OLD_INSTALLATION,false);
+	}
+
+	public void setOldInstallation(Boolean value){
+		SharedPreferences.Editor editor =  getSharedPreferences().edit();
+		editor.putBoolean(PREF_OLD_INSTALLATION, value);
+		editor.commit();
+	}
+
+
 	public String getDefinedControlLayoutLand(){
 		return getSharedPreferences().getString(PREF_DEFINED_CONTROL_LAYOUT,null);
 	}

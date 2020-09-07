@@ -182,7 +182,8 @@ public class DialogHelper {
 							public void onClick(DialogInterface dialog, int id) {
 								DialogHelper.savedDialog = DIALOG_NONE;
 								mm.removeDialog(DIALOG_NEW_ROMs_DIR);
-								mm.showDialog(DialogHelper.DIALOG_ROMs_DIR);
+								mm.getPrefsHelper().setOldInstallation(true);
+								mm.recreate();
 							}
 						});
 			dialog = builder.create();

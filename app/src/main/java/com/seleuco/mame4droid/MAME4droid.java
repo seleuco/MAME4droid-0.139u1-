@@ -191,35 +191,10 @@ public class MAME4droid extends Activity {
         Emulator.setMAME4droid(this);  
         
         mainHelper.updateMAME4droid();
-        
-               
-		if (Build.VERSION.SDK_INT >= 23) {
-			// Marshmallow+
-			if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-				if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-	                dialogHelper.showMessage("You need to allow read on external storage so MAME4droid can read ROM files!",
-	                        new DialogInterface.OnClickListener() {
-	                            @Override
-	                            public void onClick(DialogInterface dialog, int which) {
-	                                requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-	                            }
-	                        });
-	                return;
-				} else {
-					this.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },1);
-				}
-			}
-			else
-			{
-				initMame4droid();	
-			}			
-		}
-		else
-		{
-	         initMame4droid();
-		}               
+
+		initMame4droid();
     }
-    
+
     protected void initMame4droid()
     {
         if(!Emulator.isEmulating())
@@ -227,13 +202,20 @@ public class MAME4droid extends Activity {
 			if(prefsHelper.getROMsDIR()==null)
 			{	            
 				if(DialogHelper.savedDialog==DialogHelper.DIALOG_NONE)
-					if (Build.VERSION.SDK_INT >= 29 && getPrefsHelper().getInstallationDIR() == null)
+					if (Build.VERSION.SDK_INT >= 29 && getPrefsHelper().getInstallationDIR() == null && !getPrefsHelper().istOldInstallation() )
 						showDialog(DialogHelper.DIALOG_NEW_ROMs_DIR);
-					else
-				        showDialog(DialogHelper.DIALOG_ROMs_DIR);
+					else {
+						if(!CheckPermissions())
+							return;
+						showDialog(DialogHelper.DIALOG_ROMs_DIR);
+					}
 			}
 			else
 			{
+				if(!getPrefsHelper().getInstallationDIR().equals(getPrefsHelper().getOldInstallationDIR())) {
+					if (!CheckPermissions())
+						return;
+				}
 				boolean res = getMainHelper().ensureInstallationDIR(mainHelper.getInstallationDIR());
 				if(res==false)
 				{
@@ -246,8 +228,30 @@ public class MAME4droid extends Activity {
 			}
         }    	
     }
-    
-    public void inflateViews(){
+
+	public Boolean CheckPermissions(){
+		if (Build.VERSION.SDK_INT >= 23) {
+			// Marshmallow+
+			if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+				if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+					dialogHelper.showMessage("You need to allow read on external storage so MAME4droid can read ROM files!",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+								}
+							});
+					return false;
+				} else {
+					this.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },1);
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public void inflateViews(){
     	inputHandler.unsetInputListeners();
     	
         Emulator.setPortraitFull(getPrefsHelper().isPortraitFullscreen());
