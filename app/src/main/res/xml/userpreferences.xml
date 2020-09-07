@@ -470,7 +470,7 @@
 			android:defaultValue="2" android:dependency="PREF_THREADED_VIDEO"/>
 		
         <com.seleuco.mame4droid.prefs.CheckBoxPrefWithWarn android:key="PREF_DOUBLE_BUFFER"
-			android:title="Double buffer" android:summary="Avoids flickering at the expense of performance"
+			android:title="Double buffer" android:summary="Avoids flickering on older devices at the expense of input latency"
 			android:defaultValue="True" />
                		
 		<com.seleuco.mame4droid.prefs.ListPrefWithWarn android:entries="@array/pref_low_norm_or_hight_options"
