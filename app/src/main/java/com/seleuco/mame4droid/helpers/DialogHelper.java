@@ -159,9 +159,9 @@ public class DialogHelper {
 			builder.setMessage(
 					"Since Android 10 Google has added scoped storage."+
 					"That means applications can no longer read anywhere on the SD card, only in their own directories.\n\n"+
-					"There is a compatibility flag that allows applications to work as they did before, but it can stop working at any time.\n\n" +
+					"I have used a compatibility flag that allows applications to work as they did before, but it can stop working at any time.\n\n" +
 					"That is why now the application will install files and create the roms directory within '/sdcard/Android/data/com.seleuco.mame4droid/files' instead old '/sdcard/MAME4droid/' path.\n\n"+
-					"This has the disadvantage that when you uninstall the application, all files, such as roms or save states, will be deleted.\n"+
+					"This has the disadvantage that when you uninstall the application, all files, such as roms or save states, will be deleted.The good, I no longer need permission to read from your SD.\n\n"+
 					"However, as long as it works, you can continue to use the old way.\n\n"+
 					"which one do you want?"
 			)

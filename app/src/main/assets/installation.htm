@@ -17,9 +17,11 @@
 	<div class="content">
       <h3>First Time Installation</h3>
       <p>When MAME4droid is first run, it will create a folder structure for you on the internal memory of your Android device.</p>
-      <p>The default folder is:  <em>/sdcard/MAME4droid/</em></p>
+      <p>The default folder is:  <em>/sdcard/MAME4droid/</em> (check out 2020 note)</p>
       <p>This folder contains all the other folders MAME uses as well as some basic configuration files.</p>
       <p>Since MAME4droid does not come with game ROM files, you will need to copy them to the<em> /sdcard/MAME4droid/roms</em> folder yourself. These should be properly named, ZIPped MAME v1.39u1 ROMs files with the filenames in all lower case.</p>
+	  <p>2020 Note: From Android 10 Google has added scoped storage. That means applications can no longer read anywhere on the SD card, only in their own directories.I have used a compatibility flag that allows applications to work as they did before, but it can stop working at any time. That is why now the application will install files and create the roms directory within <em>/sdcard/Android/data/com.seleuco.mame4droid/files</em> instead old <em>/sdcard/MAME4droid/</em> path. This has the disadvantage that when you uninstall the application, all files, such as roms or save states, will be deleted.The good, I no longer need permission to read from your SD. However, as long as it works, you can continue to use the old way.</p> 
+	  <p>
       <h3>Update/ Custom Installation</h3>
       <p>MAME4droid (0.l39u1) version 1.7 (January 7th, 2015) made some changes to the default locations and installation due to the enhanced SD Card security of KitKat and Lollipop versions of the Android operating system. This can have an adverse effect on previous installations of MAME4droid users while helping those with these versions of Android.</p>
       <p>Your ROMs are still safe and sound - right where you left them which is probably on your external microSD card.  The quick fix is to simply go into <em>Options-&gt;Settings-&gt;General-&gt;Change ROMs Path</em>.  Point this to your actual ROMs folder (not your MAME4droid folder). If you have no custom filters or have 'favorites' turned on, you should now see all your ROMs as you remember them.</p>
