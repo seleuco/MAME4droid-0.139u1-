@@ -69,6 +69,7 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.Toast;
 
+import com.seleuco.mame4droid.helpers.DialogHelper;
 import com.seleuco.mame4droid.helpers.PrefsHelper;
 import com.seleuco.mame4droid.views.EmulatorViewGL;
  
@@ -676,31 +677,52 @@ public class Emulator
 			    	  //android.os.Debug.waitForDebugger();
 			      	  Uri _uri = intent.getData();
 			      	  System.out.println("URI: "+_uri.toString());
+			      	  boolean error = false;
 
 			      	  String filePath = null;
 					  Log.d("","URI = "+ _uri);
-					  if (_uri != null && "content".equals(_uri.getScheme())) {
-						Cursor cursor = mm.getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
-						cursor.moveToFirst();
-						filePath = cursor.getString(0);
-						cursor.close();
-					  } else {
-						filePath = _uri.getPath();
+					  try {
+						  if (_uri != null && "content".equals(_uri.getScheme())) {
+							  Cursor cursor = mm.getContentResolver().query(_uri, new String[]{android.provider.MediaStore.Images.ImageColumns.DATA}, null, null, null);
+							  cursor.moveToFirst();
+							  filePath = cursor.getString(0);
+							  cursor.close();
+						  } else {
+							  filePath = _uri.getPath();
+						  }
+					  }catch(Exception e){
+					  	error = true;
 					  }
 
-			          java.io.File f = new java.io.File(filePath);
-			          final String name = f.getName();
-			          String path = f.getAbsolutePath().substring(0,f.getAbsolutePath().lastIndexOf(File.separator));
-			          Emulator.setValueStr(Emulator.ROM_NAME, name);
-			          Emulator.setValueStr(Emulator.ROM_PATH, path);
-			          System.out.println("XX name: "+name);
-					  System.out.println("XX path: "+path);
-			          extROM = true;
-					  mm.runOnUiThread(new Runnable() {																							
-						    public void run() {
-						    	Toast.makeText(mm, "MAME4droid (0.139) "+ versionName +" by David Valdeita (Seleuco). Launching: "+name, Toast.LENGTH_LONG).show();
-						    }
-					  });		        			          
+					  if(filePath==null)
+						  error = true;
+
+					  if(error)
+					  {
+						  mm.runOnUiThread(new Runnable() {
+							  public void run() {
+								  mm.getDialogHelper().setInfoMsg("Error opening file...");
+								  mm.showDialog(DialogHelper.DIALOG_INFO);
+							  }
+						  });
+					  }
+					  else {
+
+						  java.io.File f = new java.io.File(filePath);
+						  final String name = f.getName();
+						  String path = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf(File.separator));
+						  Emulator.setValueStr(Emulator.ROM_NAME, name);
+						  Emulator.setValueStr(Emulator.ROM_PATH, path);
+						  System.out.println("XX name: " + name);
+						  System.out.println("XX path: " + path);
+						  extROM = true;
+
+						  mm.runOnUiThread(new Runnable() {
+							  public void run() {
+								  Toast.makeText(mm, "MAME4droid (0.139) " + versionName + " by David Valdeita (Seleuco). Launching: " + name, Toast.LENGTH_LONG).show();
+							  }
+						  });
+					  }
 			    }
 			    else
 			    {

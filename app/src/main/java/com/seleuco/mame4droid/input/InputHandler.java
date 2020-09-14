@@ -289,9 +289,14 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 	public static Boolean hasMethodControllerNumber = false;
 	public static int getGamePadId(InputDevice id)
 	{
-		int iDeviceId = id.getId();
+		int iDeviceId = 0;
 		int iControllerNumber = 0;
-		
+
+		try{
+			iDeviceId = id.getId();
+		} catch (Exception e) {
+		}
+
 		if(hasMethodControllerNumber) { // upper android 4.4
 			try {
 				Method method = id.getClass().getMethod("getControllerNumber");
