@@ -195,7 +195,12 @@ public class DialogHelper {
 	    	       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 	    	           public void onClick(DialogInterface dialog, int id) {
 	    	                //System.exit(0);
-	    	                android.os.Process.killProcess(android.os.Process.myPid());   
+						   if(android.os.Build.VERSION.SDK_INT >= 21) {
+							   mm.finishAndRemoveTask();
+						   }
+						   else
+						   	   mm.finish();
+						   android.os.Process.killProcess(android.os.Process.myPid());
 	    	           }
 	    	       })
 	    	       .setNegativeButton("No", new DialogInterface.OnClickListener() {

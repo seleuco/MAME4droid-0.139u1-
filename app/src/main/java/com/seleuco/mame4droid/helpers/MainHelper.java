@@ -49,7 +49,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.zip.ZipEntry;
@@ -62,6 +64,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -70,6 +73,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.OpenableColumns;
 import android.view.Display;
 import android.view.View;
 import android.view.View.MeasureSpec;
@@ -1152,6 +1156,54 @@ galaxy sde	   --> 2560x1600 16:10
 		} catch (Throwable e) {
 			return false;
 		}
+	}
+
+	public String getFileName(Uri uri) {
+		String result = null;
+		if (uri.getScheme().equals("content")) {
+			Cursor cursor = mm.getContentResolver().query(uri, null, null, null, null);
+			try {
+				if (cursor != null && cursor.moveToFirst()) {
+					result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+				}
+			} finally {
+				cursor.close();
+			}
+		}
+		if (result == null) {
+			result = uri.getPath();
+			int cut = result.lastIndexOf('/');
+			if (cut != -1) {
+				result = result.substring(cut + 1);
+			}
+		}
+		return result;
+	}
+
+	public boolean copyFile(InputStream input, String path, String fileName) {
+		boolean error = false;
+		try {
+			File file = new File(path, fileName);
+			try (OutputStream output = new FileOutputStream(file)) {
+				byte[] buffer = new byte[4 * 1024];
+				int read;
+				while ((read = input.read(buffer)) != -1) {
+					output.write(buffer, 0, read);
+				}
+				output.flush();
+			}
+		} catch(Exception e)
+		{
+		   error = true;
+		}
+		finally {
+			try {
+				input.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return error;
 	}
 
 }

@@ -419,13 +419,13 @@
 	</string-array>		
 	
     <string-array name="pref_netplay_delay_options">
-	    <item>Auto</item>
-		<item>1</item>
-		<item>2</item>
-		<item>3</item>
-		<item>4</item>
-        <item>5</item>		
-        <item>6</item>
+	    <item>Auto (experimental, at your risk)</item>
+		<item>1 (low input latency 5Ghz WIFI needed)</item>
+		<item>2 (recommended)</item>
+		<item>3 (bad connection or 2.4Ghz WIFI)</item>
+		<item>4 (if very bad connection)</item>
+        <item>5 (high input latency but..)</item>
+        <item>6 (Are you sure?)</item>
 		<item>7</item>
 		<item>8</item>
 		<item>9</item>																		

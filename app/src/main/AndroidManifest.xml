@@ -37,7 +37,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/zip" />
-                <data android:host="*" android:scheme="file" />
+                <data android:host="*" android:scheme="file" android:maxSdkVersion="24"/>
                 <data android:host="*" android:scheme="content" />
             </intent-filter>
         </activity>

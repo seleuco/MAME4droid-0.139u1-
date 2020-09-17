@@ -262,6 +262,8 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 	public InputHandler(MAME4droid value){
 		
 		mm = value;
+
+		fakeID = mm.getPrefsHelper().isFakeID();
 		
 		stick.setMAME4droid(mm);
 		tiltSensor.setMAME4droid(mm);
@@ -285,7 +287,8 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
         resetInput();
     
 	}
-	
+
+	public static Boolean fakeID = false;
 	public static Boolean hasMethodControllerNumber = false;
 	public static int getGamePadId(InputDevice id)
 	{
@@ -293,11 +296,14 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 		int iControllerNumber = 0;
 
 		try{
-			iDeviceId = id.getId();
+			if(!fakeID)
+			   	iDeviceId = id.getId();
+			else
+				iDeviceId = 0;
 		} catch (Exception e) {
 		}
 
-		if(hasMethodControllerNumber) { // upper android 4.4
+		if(hasMethodControllerNumber && !fakeID) { // upper android 4.4
 			try {
 				Method method = id.getClass().getMethod("getControllerNumber");
 				if (method != null) {
@@ -310,7 +316,7 @@ public class InputHandler implements OnTouchListener, OnKeyListener, IController
 		}
 		return  iDeviceId;
 	}
-	public static int makeKeyCodeWithDeviceID(InputDevice id, int iKeyCode)	
+	public static int makeKeyCodeWithDeviceID(InputDevice id, int iKeyCode)
 	{
 		int padid = 0;
 		try{

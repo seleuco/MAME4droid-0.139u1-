@@ -64,6 +64,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.seleuco.mame4droid.helpers.DialogHelper;
@@ -163,7 +164,9 @@ public class MAME4droid extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
+        //android.os.Debug.waitForDebugger();
+
 		Log.d("EMULATOR", "onCreate "+this);
 		System.out.println("onCreate intent:"+getIntent().getAction());
 		
@@ -226,6 +229,9 @@ public class MAME4droid extends Activity {
 				    runMAME4droid();
 				}
 			}
+			if(getIntent().getAction() ==  Intent.ACTION_VIEW)
+				if(!CheckPermissions())
+					return;
         }    	
     }
 
@@ -252,6 +258,10 @@ public class MAME4droid extends Activity {
 	}
 
 	public void inflateViews(){
+
+    	if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && getPrefsHelper().isNotchUsed()) {
+			getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+		}
     	inputHandler.unsetInputListeners();
     	
         Emulator.setPortraitFull(getPrefsHelper().isPortraitFullscreen());

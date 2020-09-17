@@ -261,7 +261,11 @@
 
 		<PreferenceScreen android:key="defaultsKeys"
 			android:title="Default keys" android:summary="Restore keys to default values" />
-				
+
+		<com.seleuco.mame4droid.prefs.CheckBoxPrefWithWarn android:key="PREF_INPUT_FAKE_ID"
+			android:title="Return always same controller ID" android:summary="If you enable this option, multi controller support will be disabled and will always returned the same device ID when you define your controller. This is useful to persist configuration on controllers or keyboards which lose their mappings when you disconnect and connect again"
+			android:defaultValue="false" />
+
 		<ListPreference
 			android:entries="@array/pref_automap_options"
 			android:title='Automap options'			
@@ -419,8 +423,12 @@
 			android:entries="@array/pref_navbar_options"
 			android:entryValues="@array/pref_navbar_values"
 			android:defaultValue="1"/>
-	    
-	    <CheckBoxPreference android:key="PREF_GLOBAL_SCALE_BEYOND"
+
+		<com.seleuco.mame4droid.prefs.CheckBoxPrefWithWarn android:key="PREF_GLOBAL_USE_NOTCH"
+			android:title="Use Notch" android:summary="Expand display area to use notch area on devices supported"
+			android:defaultValue="false" />
+
+		<CheckBoxPreference android:key="PREF_GLOBAL_SCALE_BEYOND"
 			android:title="Scale beyond boundaries" android:summary="Enable it to scale beyond screen boundaries when a fixed scale is selected"
 			android:defaultValue="true" />		
 			
@@ -439,9 +447,9 @@
 		<ListPreference
 			android:entries="@array/pref_netplay_delay_options"
 			android:title='Netplay host delay frame'			
-			android:key="PREF_NETPLAY_DELAY"
+			android:key="PREF_NETPLAY_DELAY_3"
 			android:entryValues="@array/pref_netplay_delay_values"
-			android:defaultValue="0" />	
+			android:defaultValue="2" />
 			                		   			
 	</PreferenceScreen>				
 	

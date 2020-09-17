@@ -45,9 +45,12 @@
 package com.seleuco.mame4droid;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -64,6 +67,8 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -657,9 +662,9 @@ public class Emulator
 	public static void emulate(final String libPath,final String resPath){
 
 		//Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-				
+
 		if (isEmulating)return;
-				
+
 		Thread t = new Thread(new Runnable(){
 			
 			public void run() {
@@ -671,31 +676,55 @@ public class Emulator
 				Emulator.setValueStr(Emulator.VERSION, versionName);
 				Intent intent = mm.getIntent();
 			    String action = intent.getAction();
-			     
-			    if(action == Intent.ACTION_VIEW)
+				//Uri pkg = null;
+				String fileName = null;
+				String path = null;
+				boolean delete = false;
+				if(action == Intent.ACTION_VIEW)
 			    {
 			    	  //android.os.Debug.waitForDebugger();
+					  //pkg = mm.getReferrer();
+					  //System.out.println("PKG: "+pkg.getHost());
+
 			      	  Uri _uri = intent.getData();
-			      	  System.out.println("URI: "+_uri.toString());
+			      	  //System.out.println("URI: "+_uri.toString());
 			      	  boolean error = false;
 
-			      	  String filePath = null;
+			      	  //String filePath = null;
+
+
 					  Log.d("","URI = "+ _uri);
 					  try {
 						  if (_uri != null && "content".equals(_uri.getScheme())) {
+						  	  /*
 							  Cursor cursor = mm.getContentResolver().query(_uri, new String[]{android.provider.MediaStore.Images.ImageColumns.DATA}, null, null, null);
 							  cursor.moveToFirst();
 							  filePath = cursor.getString(0);
 							  cursor.close();
+				              java.io.File f = new java.io.File(filePath);
+							  fileName = f.getName();
+							  path = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf(File.separator));
+							  */
+							  fileName = mm.getMainHelper().getFileName(_uri);
+							  String state = Environment.getExternalStorageState();
+
+						  	  if(Environment.MEDIA_MOUNTED.equals(state)) {
+								  path = mm.getExternalCacheDir().getPath();
+								  java.io.InputStream input = mm.getContentResolver().openInputStream(_uri);
+								  error = mm.getMainHelper().copyFile(input,path,fileName);
+								  delete = true;
+							  }
+						  	  else
+						  	  	error = true;
 						  } else {
-							  filePath = _uri.getPath();
+							  String filePath = _uri.getPath();
+							  java.io.File f = new java.io.File(filePath);
+							  fileName = f.getName();
+							  path = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf(File.separator));
 						  }
 					  }catch(Exception e){
 					  	error = true;
 					  }
-
-					  if(filePath==null)
-						  error = true;
 
 					  if(error)
 					  {
@@ -708,15 +737,12 @@ public class Emulator
 					  }
 					  else {
 
-						  java.io.File f = new java.io.File(filePath);
-						  final String name = f.getName();
-						  String path = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf(File.separator));
-						  Emulator.setValueStr(Emulator.ROM_NAME, name);
+						  Emulator.setValueStr(Emulator.ROM_NAME, fileName);
 						  Emulator.setValueStr(Emulator.ROM_PATH, path);
-						  System.out.println("XX name: " + name);
+						  System.out.println("XX name: " + fileName);
 						  System.out.println("XX path: " + path);
 						  extROM = true;
-
+						  final String name = fileName;
 						  mm.runOnUiThread(new Runnable() {
 							  public void run() {
 								  Toast.makeText(mm, "MAME4droid (0.139) " + versionName + " by David Valdeita (Seleuco). Launching: " + name, Toast.LENGTH_LONG).show();
@@ -732,13 +758,30 @@ public class Emulator
 			    			    
 				mm.getMainHelper().updateEmuValues();
 				runT();
-				
-				if(extROM)
+
+				if(extROM) {
+					/*
+					if (pkg != null && "com.digdroid.alman.dig".equals(pkg.getHost())) {
+						PackageManager pm = mm.getPackageManager();
+						Intent intent2 = pm.getLaunchIntentForPackage("com.digdroid.alman.dig");
+						mm.startActivity(intent2);
+					}*/
+					if(delete)
+					{
+						java.io.File f = new java.io.File(path,fileName);
+						f.delete();
+					}
 					mm.runOnUiThread(new Runnable() {
-		                public void run() {
-		 				   android.os.Process.killProcess(android.os.Process.myPid());
-		                }
-		            }); 				
+						public void run() {
+							if(android.os.Build.VERSION.SDK_INT >= 21) {
+								mm.finishAndRemoveTask();
+							}
+							else
+								mm.finish();
+							android.os.Process.killProcess(android.os.Process.myPid());
+						}
+					});
+				}
 			}			
 		},"emulatorNativeMain-Thread");
 		

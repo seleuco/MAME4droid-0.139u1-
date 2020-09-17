@@ -121,6 +121,7 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener
 	final static public String  PREF_AUTOFIRE = "PREF_AUTOFIRE";
 	final static public String  PREF_MOUSE = "PREF_MOUSE";
 	final static public String  PREF_SHIELDCONTROLLER_AS_MOUSE = "PREF_SHIELDCONTROLLER_AS_MOUSE";
+	final static public String  PREF_INPUT_FAKE_ID = "PREF_INPUT_FAKE_ID";
 	
 	final static public String  PREF_TILT_SENSOR = "PREF_TILT_SENSOR";
 	final static public String  PREF_TILT_DZ = "PREF_TILT_DZ";
@@ -165,9 +166,10 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener
 	final static public String  PREF_GLOBAL_NAVBAR_MODE = "PREF_GLOBAL_NAVBAR_MODE";
 	final static public String  PREF_GLOBAL_SCALE_BEYOND = "PREF_GLOBAL_SCALE_BEYOND";
 	final static public String  PREF_GLOBAL_OVERSCAN = "PREF_GLOBAL_OVERSCAN";
+	final static public String  PREF_GLOBAL_USE_NOTCH = "PREF_GLOBAL_USE_NOTCH";
 	
 	final static public String  PREF_NETPLAY_PORT = "PREF_NETPLAY_PORT";
-	final static public String  PREF_NETPLAY_DELAY = "PREF_NETPLAY_DELAY";
+	final static public String  PREF_NETPLAY_DELAY = "PREF_NETPLAY_DELAY_3";
 	final static public String  PREF_NETPLAY_PEERADDR = "PREF_NETPLAY_PEERADR";	
 	
 	final static public String  PREF_MAME_DEFAULTS = "PREF_MAME_DEFAULTS";
@@ -690,8 +692,12 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener
 	
 	public boolean isOverscan(){
 		return getSharedPreferences().getBoolean("PREF_GLOBAL_OVERSCAN",false);
-	}	
-	
+	}
+
+	public boolean isNotchUsed(){
+		return getSharedPreferences().getBoolean(PREF_GLOBAL_USE_NOTCH,false);
+	}
+
 	public int getNetplayDelay(){
 		return Integer.valueOf(getSharedPreferences().getString(PREF_NETPLAY_DELAY,"0")).intValue();
 	}	
@@ -710,5 +716,9 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener
 	
 	public String getCustomBIOS(){
 		return getSharedPreferences().getString(PREF_BIOS,"");
-	}	
+	}
+
+	public boolean isFakeID(){
+		return getSharedPreferences().getBoolean(PREF_INPUT_FAKE_ID,false);
+	}
 }
