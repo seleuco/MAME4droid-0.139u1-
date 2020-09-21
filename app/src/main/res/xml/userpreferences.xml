@@ -107,9 +107,9 @@
 	    <com.seleuco.mame4droid.prefs.ListPrefWithWarn
 			android:entries="@array/pref_sound_options"
 			android:title='Sound'			
-			android:key="PREF_GLOBAL_SOUND"
+			android:key="PREF_GLOBAL_SOUND_2"
 			android:entryValues="@array/pref_sound_values"
-			android:defaultValue="44100" />	
+			android:defaultValue="44100" />
 				    						
 	   	<CheckBoxPreference android:key="PREF_GLOBAL_SHOW_FPS"
 			android:title="Show FPS" android:summary="Enable it to turn FPS display on"

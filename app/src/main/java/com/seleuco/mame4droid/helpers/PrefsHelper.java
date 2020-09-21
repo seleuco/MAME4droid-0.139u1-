@@ -73,7 +73,7 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener
 	final static public String PREF_GLOBAL_FRAMESKIP = "PREF_GLOBAL_FRAMESKIP";
 	final static public String PREF_GLOBAL_THROTTLE = "PREF_GLOBAL_THROTTLE";
 	final static public String PREF_GLOBAL_VSYNC = "PREF_GLOBAL_VSYNC_2";
-	final static public String PREF_GLOBAL_SOUND = "PREF_GLOBAL_SOUND";
+	final static public String PREF_GLOBAL_SOUND = "PREF_GLOBAL_SOUND_2";
 	final static public String PREF_GLOBAL_SHOW_FPS = "PREF_GLOBAL_SHOW_FPS";
 	final static public String PREF_GLOBAL_SHOW_INFOWARNINGS = "PREF_GLOBAL_SHOW_INFOWARNINGS";	
 	final static public String PREF_GLOBAL_CHEAT = "PREF_GLOBAL_CHEAT";
@@ -387,9 +387,9 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener
 		}
 		return r;
 	}
-	
+
 	public int getSoundValue(){
-		return Integer.valueOf(getSharedPreferences().getString(PREF_GLOBAL_SOUND,"44100")).intValue();	
+		return Integer.valueOf(getSharedPreferences().getString(PREF_GLOBAL_SOUND,"44100")).intValue();
 	}
 	
 	public boolean isFPSShowed(){
@@ -673,7 +673,7 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener
 	}
 	
 	public boolean isDefaultData(){
-		
+
 		boolean v = getSharedPreferences().getBoolean(PrefsHelper.PREF_MAME_DEFAULTS, false);
 		
 		if(v)

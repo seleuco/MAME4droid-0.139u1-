@@ -157,7 +157,8 @@ public class Emulator
     private static MAME4droid mm = null;
     
     private static boolean isEmulating = false;
-    public static boolean isEmulating() {
+
+	public static boolean isEmulating() {
 		return isEmulating;
 	}
 
@@ -568,8 +569,7 @@ public class Emulator
 	
 	//SOUND
 	static public void initAudio(int freq, boolean stereo)	
-	{		
-		
+	{
 		int sampleFreq = freq;
 		
 		int channelConfig = stereo ? AudioFormat.CHANNEL_CONFIGURATION_STEREO : AudioFormat.CHANNEL_CONFIGURATION_MONO;
@@ -578,7 +578,7 @@ public class Emulator
 		int bufferSize = AudioTrack.getMinBufferSize(sampleFreq, channelConfig, audioFormat);
 
         if (mm.getPrefsHelper().getSoundEngine()==PrefsHelper.PREF_SNDENG_AUDIOTRACK_HIGH)
-			bufferSize *= 2;
+			bufferSize +=  bufferSize / 4;
 				
 		//System.out.println("Buffer Size "+bufferSize);
 		
@@ -593,8 +593,10 @@ public class Emulator
 	}
 	
 	public static void endAudio(){
-		audioTrack.stop();
-		audioTrack.release();	
+		if(audioTrack!=null) {
+			audioTrack.stop();
+			audioTrack.release();
+		}
 		audioTrack = null;
 	}
 		

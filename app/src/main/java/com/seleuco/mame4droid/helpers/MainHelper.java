@@ -461,7 +461,7 @@ public class MainHelper {
 		Emulator.setValue(Emulator.THROTTLE, prefsHelper.isThrottle() ? 1 : 0);
 		Emulator.setValue(Emulator.AUTOSAVE, prefsHelper.isAutosave() ? 1 : 0);
 		Emulator.setValue(Emulator.CHEAT, prefsHelper.isCheat() ? 1 : 0);
-		Emulator.setValue(Emulator.SOUND_VALUE, prefsHelper.getSoundValue());
+
 		Emulator.setValue(Emulator.FRAME_SKIP_VALUE,
 				prefsHelper.getFrameSkipValue());
 
@@ -526,18 +526,19 @@ public class MainHelper {
 
 		AudioManager am = (AudioManager) mm
 				.getSystemService(Context.AUDIO_SERVICE);
-		int sfr = 2048;
-		try {
-			sfr = Integer
-					.valueOf(
-							am.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER))
-					.intValue();
-			System.out.println("PROPERTY_OUTPUT_FRAMES_PER_BUFFER:" + sfr);
-		} catch (Throwable e) {
+		int sfr = 256;
+
+		if (mm.getPrefsHelper().getSoundEngine() == PrefsHelper.PREF_SNDENG_OPENSL_LOW) {
+			try {
+				sfr = Integer
+						.valueOf(
+								am.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER))
+						.intValue();
+				System.out.println("PROPERTY_OUTPUT_FRAMES_PER_BUFFER:" + sfr);
+			} catch (Throwable e) {
+			}
 		}
 
-		if (mm.getPrefsHelper().getSoundEngine() == PrefsHelper.PREF_SNDENG_OPENSL)
-			sfr *= 2;
 		Emulator.setValue(Emulator.SOUND_DEVICE_FRAMES, sfr);
 
 		int sr = 44100;
@@ -548,7 +549,19 @@ public class MainHelper {
 			System.out.println("PROPERTY_OUTPUT_SAMPLE_RATE:" + sr);
 		} catch (Throwable e) {
 		}
+
+		Context context = mm.getApplicationContext();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if (!prefs.getBoolean("sound_rate", false)) {
+			SharedPreferences.Editor edit = prefs.edit();
+			edit.putBoolean("sound_rate", true);
+			if(sr==48000)//sino defecto 44100
+			   edit.putString(PrefsHelper.PREF_GLOBAL_SOUND, sr + "");
+			edit.commit();
+		}
+
 		Emulator.setValue(Emulator.SOUND_DEVICE_SR, sr);
+		Emulator.setValue(Emulator.SOUND_VALUE, prefsHelper.getSoundValue());
 
 		Emulator.setValueStr(Emulator.BIOS, mm.getPrefsHelper().getCustomBIOS());
 	}
@@ -797,8 +810,11 @@ galaxy sde	   --> 2560x1600 16:10
 			Intent i = new Intent(mm, WebHelpActivity.class);
 			i.putExtra("INSTALLATION_PATH", mm.getMainHelper()
 					.getInstallationDIR());
-			mm.startActivityForResult(i, MainHelper.SUBACTIVITY_HELP);
-
+			try {
+				mm.startActivityForResult(i, MainHelper.SUBACTIVITY_HELP);
+			}catch (RuntimeException e){
+				e.printStackTrace();
+			}
 			/*
 			mm.getDialogHelper()
 			.setInfoMsg(

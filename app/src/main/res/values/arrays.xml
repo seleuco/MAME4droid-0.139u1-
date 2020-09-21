@@ -255,10 +255,10 @@
 	</string-array>
 	
 	<string-array name="pref_sound_engine_options">
-	    <item>AudioTrack (good)</item>
+	    <item>AudioTrack</item>
 		<item>AudioTrack high latency (safe)</item>
 	    <item>OpenSL</item>
-        <item>OpenSL low latency</item>	    					
+        <item>OpenSL low latency (best)</item>
 	</string-array>
 	<string-array name="pref_sound_engine_values">
 		<item>1</item>

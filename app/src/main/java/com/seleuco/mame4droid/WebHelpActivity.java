@@ -45,12 +45,17 @@
 package com.seleuco.mame4droid;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class WebHelpActivity extends Activity {
 	
@@ -78,8 +83,49 @@ public class WebHelpActivity extends Activity {
         //lWebView.loadUrl("file:///" +  path +"help/index.htm");
         lWebView.loadUrl("file:///android_asset/index.htm");
 
+        // attempt to fix FileUriExposedException
+        //https://stackoverflow.com/questions/40560604/navigating-asset-based-html-files-in-webview-on-nougat
+        /*
+        WebViewClient client = new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return false;
+            }
+        };
+        lWebView.setWebViewClient(client);
+        */
+        if (android.os.Build.VERSION.SDK_INT >= 24) {
+            lWebView.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest webResourceRequest) {
+                    if (webResourceRequest.getUrl().getScheme().equals("file")) {
+                        webView.loadUrl(webResourceRequest.getUrl().toString());
+                    } else {
+                        // If the URI is not pointing to a local file, open with an ACTION_VIEW Intent
+                        webView.getContext().startActivity(new Intent(Intent.ACTION_VIEW, webResourceRequest.getUrl()));
+                    }
+                    return true; // in both cases we handle the link manually
+                }
+            });
+        } else {
+            lWebView.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+                    if (Uri.parse(url).getScheme().equals("file")) {
+                        webView.loadUrl(url);
+                    } else {
+                        // If the URI is not pointing to a local file, open with an ACTION_VIEW Intent
+                        webView.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                    }
+                    return true; // in both cases we handle the link manually
+                }
+            });
+        }
+
         lWebView.requestFocus();        
 	}
+
+
 	
     public void onBackPressed() {
     	 
