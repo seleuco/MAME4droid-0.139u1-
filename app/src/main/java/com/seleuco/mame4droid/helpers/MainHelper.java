@@ -526,7 +526,7 @@ public class MainHelper {
 
 		AudioManager am = (AudioManager) mm
 				.getSystemService(Context.AUDIO_SERVICE);
-		int sfr = 256;
+		int sfr = 512;//10ms a 48000khz
 
 		if (mm.getPrefsHelper().getSoundEngine() == PrefsHelper.PREF_SNDENG_OPENSL_LOW) {
 			try {
@@ -542,6 +542,7 @@ public class MainHelper {
 		Emulator.setValue(Emulator.SOUND_DEVICE_FRAMES, sfr);
 
 		int sr = 44100;
+
 		try {
 			sr = Integer.valueOf(
 					am.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE))
@@ -560,8 +561,14 @@ public class MainHelper {
 			edit.commit();
 		}
 
-		Emulator.setValue(Emulator.SOUND_DEVICE_SR, sr);
+		if(mm.getPrefsHelper().getSoundEngine() == PrefsHelper.PREF_SNDENG_OPENSL)
+			sr = mm.getPrefsHelper().getSoundValue();
+		/*
+		else is PrefsHelper.PREF_SNDENG_OPENSL_LOW fixed at PROPERTY_OUTPUT_SAMPLE_RATE
+		 */
+
 		Emulator.setValue(Emulator.SOUND_VALUE, prefsHelper.getSoundValue());
+		Emulator.setValue(Emulator.SOUND_DEVICE_SR, sr);
 
 		Emulator.setValueStr(Emulator.BIOS, mm.getPrefsHelper().getCustomBIOS());
 	}
