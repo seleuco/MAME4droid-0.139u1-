@@ -56,75 +56,72 @@ import com.seleuco.mame4droid.GLRenderer;
 import com.seleuco.mame4droid.MAME4droid;
 import com.seleuco.mame4droid.helpers.PrefsHelper;
 
-public  class EmulatorViewGL extends GLSurfaceView implements IEmuView{
-	
-	protected int scaleType = PrefsHelper.PREF_ORIGINAL;
-		
-	protected MAME4droid mm = null;
-	
-	protected GLRenderer render = null;
-    
-	public Renderer getRender() {
-		return render;
-	}
+public class EmulatorViewGL extends GLSurfaceView implements IEmuView {
 
-	public int getScaleType() {
-		return scaleType;
-	}
+    protected int scaleType = PrefsHelper.PREF_ORIGINAL;
 
-	public void setScaleType(int scaleType) {
-		this.scaleType = scaleType;
-	}
+    protected MAME4droid mm = null;
 
-	public void setMAME4droid(MAME4droid mm) {
-		this.mm = mm;
-		render.setMAME4droid(mm);
-	}
-	
-	public EmulatorViewGL(Context context) {
-		super(context);
-		init();
-	}
+    protected GLRenderer render = null;
 
-	public EmulatorViewGL(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init();
-	} 
-	
-	protected void init(){
-		this.setKeepScreenOn(true);
-		this.setFocusable(true);
-		this.setFocusableInTouchMode(true);
-		this.requestFocus();
-		render = new GLRenderer();
-		//setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
-		setRenderer(render);
+    public Renderer getRender() {
+        return render;
+    }
+
+    public int getScaleType() {
+        return scaleType;
+    }
+
+    public void setScaleType(int scaleType) {
+        this.scaleType = scaleType;
+    }
+
+    public void setMAME4droid(MAME4droid mm) {
+        this.mm = mm;
+        render.setMAME4droid(mm);
+    }
+
+    public EmulatorViewGL(Context context) {
+        super(context);
+        init();
+    }
+
+    public EmulatorViewGL(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    protected void init() {
+        this.setKeepScreenOn(true);
+        this.setFocusable(true);
+        this.setFocusableInTouchMode(true);
+        this.requestFocus();
+        render = new GLRenderer();
+        //setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
+        setRenderer(render);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
         //setRenderMode(RENDERMODE_CONTINUOUSLY);        
-	}
-		
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		if(mm==null)
-		{
-			setMeasuredDimension(widthMeasureSpec,heightMeasureSpec);
-		}
-		else
-		{
-		   ArrayList<Integer> l = mm.getMainHelper().measureWindow(widthMeasureSpec, heightMeasureSpec, scaleType);
-		   setMeasuredDimension(l.get(0).intValue(),l.get(1).intValue());
-		}
-		//System.out.println("onMeasure"+l.get(0).intValue()+" "+l.get(1).intValue()); 
-	}
-		
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		super.onSizeChanged(w, h, oldw, oldh);
-		Emulator.setWindowSize(w, h);		
-	}
-		
-	@Override
-	public boolean onTrackballEvent(MotionEvent event) {
-		return mm.getInputHandler().onTrackballEvent(event);
-	}
+    }
+
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (mm == null) {
+            setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
+        } else {
+            ArrayList<Integer> l = mm.getMainHelper().measureWindow(widthMeasureSpec, heightMeasureSpec, scaleType);
+            setMeasuredDimension(l.get(0).intValue(), l.get(1).intValue());
+        }
+        //System.out.println("onMeasure"+l.get(0).intValue()+" "+l.get(1).intValue());
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        Emulator.setWindowSize(w, h);
+    }
+
+    @Override
+    public boolean onTrackballEvent(MotionEvent event) {
+        return mm.getInputHandler().onTrackballEvent(event);
+    }
 
 }

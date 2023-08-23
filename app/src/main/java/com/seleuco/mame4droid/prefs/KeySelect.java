@@ -59,47 +59,48 @@ import android.widget.LinearLayout;
 
 public class KeySelect extends Activity {
 
-	protected int emulatorInputIndex;
+    protected int emulatorInputIndex;
 
-	@Override
-	public void onCreate(Bundle icicle) {
-		super.onCreate(icicle);
+    @Override
+    public void onCreate(Bundle icicle) {
+        super.onCreate(icicle);
 
-		emulatorInputIndex = getIntent().getIntExtra("emulatorInputIndex", 0);
-		setTitle("Press button for \""+ListKeys.emulatorInputLabels[emulatorInputIndex]+"\"");
+        emulatorInputIndex = getIntent().getIntExtra("emulatorInputIndex", 0);
+        setTitle("Press button for \"" + ListKeys.emulatorInputLabels[emulatorInputIndex] + "\"");
 
 
-		final Button chancelButton = new Button(this) {
-			{
-				setText("Cancel");
-				setOnClickListener(new View.OnClickListener() {
-					public void onClick(View v) {
-						setResult(RESULT_CANCELED, new Intent());
-						finish();
-					}
-				});
-			}
-		};
+        final Button chancelButton = new Button(this) {
+            {
+                setText("Cancel");
+                setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        setResult(RESULT_CANCELED, new Intent());
+                        finish();
+                    }
+                });
+            }
+        };
 
-		final Button clearButton = new Button(this) {
-			{
-				setText("Clear");
-				setOnClickListener(new View.OnClickListener() {
-					public void onClick(View v) {
-						setResult(RESULT_OK, new Intent().putExtra("androidKeyCode",  -1));
-						finish();
-					}
-				});
-			}
-		};
+        final Button clearButton = new Button(this) {
+            {
+                setText("Clear");
+                setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        setResult(RESULT_OK, new Intent().putExtra("androidKeyCode", -1));
+                        finish();
+                    }
+                });
+            }
+        };
 
-		final View primaryView = new View(this) {
-			{
-				setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 1));
-				setFocusable(true);
-				setFocusableInTouchMode(true);
-				requestFocus();
-			}
+        final View primaryView = new View(this) {
+            {
+                setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 1));
+                setFocusable(true);
+                setFocusableInTouchMode(true);
+                requestFocus();
+            }
+
             /*
 			@Override
 			public boolean onKeyPreIme (int keyCode, KeyEvent event) {
@@ -109,33 +110,33 @@ public class KeySelect extends Activity {
 				return true;
 			}
 			*/
-			@Override
-			public boolean onKeyDown (int keyCode, KeyEvent event) {
+            @Override
+            public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-				if(emulatorInputIndex !=12 && keyCode == KeyEvent.KEYCODE_BACK) 					
-					return false;
-				if(emulatorInputIndex !=13 && keyCode == KeyEvent.KEYCODE_MENU) 					
-					return false;				
-				
-				//setResult(RESULT_OK, new Intent().putExtra("androidKeyCode", keyCode));
-				
-				setResult(RESULT_OK, new Intent().putExtra("androidKeyCode", keyCode).putExtra("androidGamePadID", InputHandler.getGamePadId(event.getDevice())));
-				finish();
-				return true;
-			}
-		};
+                if (emulatorInputIndex != 12 && keyCode == KeyEvent.KEYCODE_BACK)
+                    return false;
+                if (emulatorInputIndex != 13 && keyCode == KeyEvent.KEYCODE_MENU)
+                    return false;
 
-		final LinearLayout parentContainer = new LinearLayout(this) {
-			{
-				setOrientation(LinearLayout.VERTICAL);
-				addView(chancelButton);
-				addView(clearButton);
-				addView(primaryView);
-			}
-		};
+                //setResult(RESULT_OK, new Intent().putExtra("androidKeyCode", keyCode));
 
-		setContentView(parentContainer, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+                setResult(RESULT_OK, new Intent().putExtra("androidKeyCode", keyCode).putExtra("androidGamePadID", InputHandler.getGamePadId(event.getDevice())));
+                finish();
+                return true;
+            }
+        };
 
-	}
+        final LinearLayout parentContainer = new LinearLayout(this) {
+            {
+                setOrientation(LinearLayout.VERTICAL);
+                addView(chancelButton);
+                addView(clearButton);
+                addView(primaryView);
+            }
+        };
+
+        setContentView(parentContainer, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+
+    }
 
 }

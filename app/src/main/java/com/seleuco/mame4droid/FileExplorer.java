@@ -66,316 +66,308 @@ import com.seleuco.mame4droid.R;
 
 public class FileExplorer {
 
-	// Stores names of traversed directories
-	ArrayList<String> traversed = new ArrayList<String>();
+    // Stores names of traversed directories
+    ArrayList<String> traversed = new ArrayList<String>();
 
-	// Check if the first level of the directory structure is the one showing
-	private Boolean firstLvl = false;
+    // Check if the first level of the directory structure is the one showing
+    private Boolean firstLvl = false;
 
-	public File getPath() {
-		return path;
-	}
+    public File getPath() {
+        return path;
+    }
 
-	private static final String TAG = "FE_PATH";
+    private static final String TAG = "FE_PATH";
 
-	private Item[] fileList;
-	private File path = new File(
-	   Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "");
-	private String chosenFile;
-	private String downFile;
-	private Boolean hasZero = false;
+    private Item[] fileList;
+    private File path = new File(
+            Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "");
+    private String chosenFile;
+    private String downFile;
+    private Boolean hasZero = false;
 
-	ListAdapter adapter;
+    ListAdapter adapter;
 
-	protected MAME4droid mm = null;
+    protected MAME4droid mm = null;
 
-	public FileExplorer(MAME4droid mm) {
-		this.mm = mm;
-	}
+    public FileExplorer(MAME4droid mm) {
+        this.mm = mm;
+    }
 
-	private void loadFileList() {
+    private void loadFileList() {
 
-		// Checks whether path exists
-		if (path.exists()) {
-			FilenameFilter filter = new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String filename) {
-					File sel = new File(dir, filename);
-					// Filters based on whether the file is hidden or not
-					return (/* sel.isFile() || */sel.isDirectory())
-							&& !sel.isHidden();
+        // Checks whether path exists
+        if (path.exists()) {
+            FilenameFilter filter = new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String filename) {
+                    File sel = new File(dir, filename);
+                    // Filters based on whether the file is hidden or not
+                    return (/* sel.isFile() || */sel.isDirectory())
+                            && !sel.isHidden();
 
-				}
-			};
+                }
+            };
 
-			String[] fList = path.list(filter);
-			//String[] fList = path.list();
-			
-			if (fList == null)
-				fList = new String[0];
-			
-			if(downFile!= null)
-			{
-				boolean f = false;
-				for(int i= 0; i < fList.length && !f; i++)
-					f = downFile.equals(fList[i]);
-				if(!f)
-				{
-					String[] fListNew = new String[fList.length+1];
-					for(int i= 0; i < fList.length; i++) 
-						fListNew[i] = fList[i];
-					fListNew[fListNew.length-1] = downFile;
-					fList = fListNew;
-				}				
-			}
-			
-			if(hasZero && path!=null && path.getAbsolutePath().equals("/storage/emulated"))
-			{
-				boolean f = false;
-				for(int i= 0; i < fList.length && !f; i++)
-					f = "0".equals(fList[i]);
-				if(!f)
-				{
-					String[] fListNew = new String[fList.length+1];
-					for(int i= 0; i < fList.length; i++) 
-						fListNew[i] = fList[i];
-					fListNew[fListNew.length-1] = "0";
-					fList = fListNew;
-				}				
-			}			
+            String[] fList = path.list(filter);
+            //String[] fList = path.list();
 
-			fileList = new Item[fList.length];
-			for (int i = 0; i < fList.length; i++) {
-				fileList[i] = new Item(fList[i], R.drawable.file_icon);
+            if (fList == null)
+                fList = new String[0];
 
-				// Convert into file path
-				File sel = new File(path, fList[i]);
+            if (downFile != null) {
+                boolean f = false;
+                for (int i = 0; i < fList.length && !f; i++)
+                    f = downFile.equals(fList[i]);
+                if (!f) {
+                    String[] fListNew = new String[fList.length + 1];
+                    for (int i = 0; i < fList.length; i++)
+                        fListNew[i] = fList[i];
+                    fListNew[fListNew.length - 1] = downFile;
+                    fList = fListNew;
+                }
+            }
 
-				// Set drawables
-				if (sel.isDirectory()) {
-					fileList[i].icon = R.drawable.directory_icon;
-					Log.d("DIRECTORY", fileList[i].file);
-				} else {
-					Log.d("FILE", fileList[i].file);
-				}
-			}
+            if (hasZero && path != null && path.getAbsolutePath().equals("/storage/emulated")) {
+                boolean f = false;
+                for (int i = 0; i < fList.length && !f; i++)
+                    f = "0".equals(fList[i]);
+                if (!f) {
+                    String[] fListNew = new String[fList.length + 1];
+                    for (int i = 0; i < fList.length; i++)
+                        fListNew[i] = fList[i];
+                    fListNew[fListNew.length - 1] = "0";
+                    fList = fListNew;
+                }
+            }
 
-			if (!firstLvl) {
-				Item temp[] = new Item[fileList.length + 1];
-				for (int i = 0; i < fileList.length; i++) {
-					temp[i + 1] = fileList[i];
-				}
-				temp[0] = new Item("Up", R.drawable.directory_up);
-				fileList = temp;
-			}
-		} else {
-			Log.e(TAG, "path does not exist");
-		}
+            fileList = new Item[fList.length];
+            for (int i = 0; i < fList.length; i++) {
+                fileList[i] = new Item(fList[i], R.drawable.file_icon);
 
-		adapter = new ArrayAdapter<Item>(mm,
-				/*android.R.layout.select_dialog_item*/android.R.layout.simple_list_item_1, android.R.id.text1,
-				fileList) {
-			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
-				// creates view
-				View view = super.getView(position, convertView, parent);
-				TextView textView = (TextView) view
-						.findViewById(android.R.id.text1);
+                // Convert into file path
+                File sel = new File(path, fList[i]);
 
-				// put the image on the text view
-				textView.setCompoundDrawablesWithIntrinsicBounds(
-						fileList[position].icon, 0, 0, 0);
+                // Set drawables
+                if (sel.isDirectory()) {
+                    fileList[i].icon = R.drawable.directory_icon;
+                    Log.d("DIRECTORY", fileList[i].file);
+                } else {
+                    Log.d("FILE", fileList[i].file);
+                }
+            }
 
-				// add margin between image and text (support various screen
-				// densities)
-				int dp5 = (int) (5 * mm.getResources().getDisplayMetrics().density + 0.5f);
-				textView.setCompoundDrawablePadding(dp5);
+            if (!firstLvl) {
+                Item temp[] = new Item[fileList.length + 1];
+                for (int i = 0; i < fileList.length; i++) {
+                    temp[i + 1] = fileList[i];
+                }
+                temp[0] = new Item("Up", R.drawable.directory_up);
+                fileList = temp;
+            }
+        } else {
+            Log.e(TAG, "path does not exist");
+        }
 
-				return view;
-			}
-		};
-	}
+        adapter = new ArrayAdapter<Item>(mm,
+                /*android.R.layout.select_dialog_item*/android.R.layout.simple_list_item_1, android.R.id.text1,
+                fileList) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                // creates view
+                View view = super.getView(position, convertView, parent);
+                TextView textView = (TextView) view
+                        .findViewById(android.R.id.text1);
 
-	private class Item {
-		public String file;
-		public int icon;
+                // put the image on the text view
+                textView.setCompoundDrawablesWithIntrinsicBounds(
+                        fileList[position].icon, 0, 0, 0);
 
-		public Item(String file, Integer icon) {
-			this.file = file;
-			this.icon = icon;
-		}
+                // add margin between image and text (support various screen
+                // densities)
+                int dp5 = (int) (5 * mm.getResources().getDisplayMetrics().density + 0.5f);
+                textView.setCompoundDrawablePadding(dp5);
 
-		@Override
-		public String toString() {
-			return file;
-		}
-	}
+                return view;
+            }
+        };
+    }
 
-	public Dialog create() {
+    private class Item {
+        public String file;
+        public int icon;
 
-		//firstLvl = false;
-		if(!firstLvl && traversed.isEmpty())
-		{
-		   String[] files = path.getPath().split("/");
-           for (int i = 0; i < files.length; i++) {   
-        	 if(files[i].trim().length()!=0)
-        	    traversed.add(files[i]);
-           }
-		}
-		
-		if(path.getAbsolutePath().equals("/storage/emulated/0"))
-			hasZero = true;		
-		
-		loadFileList();
+        public Item(String file, Integer icon) {
+            this.file = file;
+            this.icon = icon;
+        }
 
-		Dialog dialog = null;
-		AlertDialog.Builder builder = new Builder(mm);
+        @Override
+        public String toString() {
+            return file;
+        }
+    }
 
-		if (fileList == null) {
-			Log.e(TAG, "No files loaded");
-			dialog = builder.create();
-			return dialog;
-		}
+    public Dialog create() {
 
-		builder.setTitle("Selected: " + path.getPath());
-		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				chosenFile = fileList[which].file;
-				File sel = new File(path + "/" + chosenFile);
-				if (sel.isDirectory()) {
-					firstLvl = false;
+        //firstLvl = false;
+        if (!firstLvl && traversed.isEmpty()) {
+            String[] files = path.getPath().split("/");
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].trim().length() != 0)
+                    traversed.add(files[i]);
+            }
+        }
 
-					downFile = null;
-					
-					// Adds chosen directory to list
-					traversed.add(chosenFile);
-					fileList = null;
-					path = new File(sel + "");
+        if (path.getAbsolutePath().equals("/storage/emulated/0"))
+            hasZero = true;
 
-					mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-					mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-					Log.d(TAG, path.getAbsolutePath());
+        loadFileList();
 
-				}
-				// Checks if 'up' was clicked
-				else if (chosenFile.equalsIgnoreCase("up") && !sel.exists()) {
+        Dialog dialog = null;
+        AlertDialog.Builder builder = new Builder(mm);
 
-					// present directory removed from list
-					String s = traversed.get(traversed.size() - 1);
-					
-					downFile = s;
+        if (fileList == null) {
+            Log.e(TAG, "No files loaded");
+            dialog = builder.create();
+            return dialog;
+        }
 
-					// path modified to exclude present directory
-					File pathTmp = new File(path.toString().substring(0,
-							path.toString().lastIndexOf(s)));
-										
-					if(pathTmp.isDirectory())
-				    {
-						path = pathTmp;
-						fileList = null;
-						
-						traversed.remove(traversed.size() - 1);
-	
-						// if there are no more directories in the list, then
-						// its the first level
-						if (traversed.isEmpty()) {
-							firstLvl = true;
-						}
-	
-						mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-						mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-						Log.d(TAG, path.getAbsolutePath());
-				    }
-					else
-					{
-						AlertDialog.Builder alert = new AlertDialog.Builder(mm); 
-						alert.setCancelable(false);
-						
-						alert.setTitle("The directory is not readable!");						
-						
-						alert.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
-						    public void onClick(DialogInterface dialog, int whichButton) {
-								mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-								mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-						    }
-						});						
-						
-						alert.show();						
-					}
-					
+        builder.setTitle("Selected: " + path.getPath());
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                chosenFile = fileList[which].file;
+                File sel = new File(path + "/" + chosenFile);
+                if (sel.isDirectory()) {
+                    firstLvl = false;
 
-				}
-				// File picked
-				else {
+                    downFile = null;
 
-				}
-			}
-		});
-		
-		builder.setNeutralButton("Manual",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						
-						final EditText edittext = new EditText(mm);
-						AlertDialog.Builder alert = new AlertDialog.Builder(mm); 
-						
-						alert.setCancelable(false);
-						
-						alert.setTitle("Custom ROM path");
-						alert.setMessage("Set your custom ROM path directly if it is not accesible to file browser. Ensure is readable and writable!");
-						
-						edittext.setText(path.getAbsolutePath());
-						edittext.setSelection(edittext.getText().length());
+                    // Adds chosen directory to list
+                    traversed.add(chosenFile);
+                    fileList = null;
+                    path = new File(sel + "");
 
-						alert.setView(edittext);
+                    mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                    mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                    Log.d(TAG, path.getAbsolutePath());
 
-						alert.setPositiveButton("Done", new DialogInterface.OnClickListener() {
-						    public void onClick(DialogInterface dialog, int whichButton) {
-								DialogHelper.savedDialog = DialogHelper.DIALOG_NONE;
-								mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-								mm.getPrefsHelper().setROMsDIR(edittext.getText().toString());						
-								mm.getMainHelper().ensureInstallationDIR(mm.getMainHelper().getInstallationDIR());
-								mm.runMAME4droid();
-						    }
-						});
+                }
+                // Checks if 'up' was clicked
+                else if (chosenFile.equalsIgnoreCase("up") && !sel.exists()) {
 
-						alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-						    public void onClick(DialogInterface dialog, int whichButton) {
-								mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-								mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-						    }
-						});
+                    // present directory removed from list
+                    String s = traversed.get(traversed.size() - 1);
 
-						alert.show();																	
-					}
-				});		
+                    downFile = s;
 
-		builder.setPositiveButton("Done",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);						
-						DialogHelper.savedDialog = DialogHelper.DIALOG_NONE;
-						mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-						mm.getPrefsHelper().setROMsDIR(path.getAbsolutePath());						
-						mm.getMainHelper().ensureInstallationDIR(mm.getMainHelper().getInstallationDIR());
-						mm.runMAME4droid();
-					}
-				});
-		
-		builder.setNegativeButton("Cancel",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {					
-						DialogHelper.savedDialog = DialogHelper.DIALOG_NONE;
-						mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
-						mm.getMainHelper().ensureInstallationDIR(mm.getMainHelper().getInstallationDIR());
-						mm.runMAME4droid();
-					}
-				});		
+                    // path modified to exclude present directory
+                    File pathTmp = new File(path.toString().substring(0,
+                            path.toString().lastIndexOf(s)));
 
-		builder.setCancelable(false);
-		dialog = builder.show();
-		return dialog;
-	}
+                    if (pathTmp.isDirectory()) {
+                        path = pathTmp;
+                        fileList = null;
+
+                        traversed.remove(traversed.size() - 1);
+
+                        // if there are no more directories in the list, then
+                        // its the first level
+                        if (traversed.isEmpty()) {
+                            firstLvl = true;
+                        }
+
+                        mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                        mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                        Log.d(TAG, path.getAbsolutePath());
+                    } else {
+                        AlertDialog.Builder alert = new AlertDialog.Builder(mm);
+                        alert.setCancelable(false);
+
+                        alert.setTitle("The directory is not readable!");
+
+                        alert.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                                mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                            }
+                        });
+
+                        alert.show();
+                    }
+
+
+                }
+                // File picked
+                else {
+
+                }
+            }
+        });
+
+        builder.setNeutralButton("Manual",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        final EditText edittext = new EditText(mm);
+                        AlertDialog.Builder alert = new AlertDialog.Builder(mm);
+
+                        alert.setCancelable(false);
+
+                        alert.setTitle("Custom ROM path");
+                        alert.setMessage("Set your custom ROM path directly if it is not accesible to file browser. Ensure is readable and writable!");
+
+                        edittext.setText(path.getAbsolutePath());
+                        edittext.setSelection(edittext.getText().length());
+
+                        alert.setView(edittext);
+
+                        alert.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                DialogHelper.savedDialog = DialogHelper.DIALOG_NONE;
+                                mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                                mm.getPrefsHelper().setROMsDIR(edittext.getText().toString());
+                                mm.getMainHelper().ensureInstallationDIR(mm.getMainHelper().getInstallationDIR());
+                                mm.runMAME4droid();
+                            }
+                        });
+
+                        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                                mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                            }
+                        });
+
+                        alert.show();
+                    }
+                });
+
+        builder.setPositiveButton("Done",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                        DialogHelper.savedDialog = DialogHelper.DIALOG_NONE;
+                        mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                        mm.getPrefsHelper().setROMsDIR(path.getAbsolutePath());
+                        mm.getMainHelper().ensureInstallationDIR(mm.getMainHelper().getInstallationDIR());
+                        mm.runMAME4droid();
+                    }
+                });
+
+        builder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        DialogHelper.savedDialog = DialogHelper.DIALOG_NONE;
+                        mm.removeDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                        mm.getMainHelper().ensureInstallationDIR(mm.getMainHelper().getInstallationDIR());
+                        mm.runMAME4droid();
+                    }
+                });
+
+        builder.setCancelable(false);
+        dialog = builder.show();
+        return dialog;
+    }
 
 }

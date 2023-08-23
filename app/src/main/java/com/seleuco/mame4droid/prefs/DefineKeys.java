@@ -61,75 +61,75 @@ import com.seleuco.mame4droid.R;
 import com.seleuco.mame4droid.input.InputHandlerExt;
 
 public class DefineKeys extends ListActivity {
-		
-	protected int playerIndex = 0;
-	
-	public static final String[] playerLabels = {
-        "Player 1",
-        "Player 2",
-        "Player 3",
-        "Player 4",        
-	};
 
-	@Override
-	public void onCreate(Bundle icicle) {
-		super.onCreate(icicle);
-				
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND,
-				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-		
-		drawListAdapter();
-	}
+    protected int playerIndex = 0;
 
-	private void drawListAdapter() {
-		final Context context = this;
+    public static final String[] playerLabels = {
+            "Player 1",
+            "Player 2",
+            "Player 3",
+            "Player 4",
+    };
 
-		ArrayAdapter<String> keyLabelsAdapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, DefineKeys.playerLabels) {
-			@Override
-			public View getView(final int position, final View convertView,
-					final ViewGroup parent) {
-				final TextView textView = new TextView(context);
-				textView.setPadding(60, 0, 60, 0);
-				textView.setTextAppearance(context, R.style.ListText);
-				textView.setText(getItem(position));				
-				return textView;
-			}
-		};
+    @Override
+    public void onCreate(Bundle icicle) {
+        super.onCreate(icicle);
 
-		setListAdapter(keyLabelsAdapter);
-	}
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND,
+                WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
 
-	@Override
-	public void onListItemClick(ListView parent, View v, int position, long id) {
-		playerIndex = position;
-		
-		boolean auto_detected = false;
-		try{auto_detected = InputHandlerExt.deviceIDs[position]!=-1;}catch(Throwable e){}
-		
-		if(auto_detected)
-		{
-			AlertDialog.Builder alertDialog =new AlertDialog.Builder(this);
-			
-			alertDialog.setTitle("GamePad Autodetect is enabled!");
-			alertDialog.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
-				   public void onClick(DialogInterface dialog, int which) {
-				   }
-				});
-			alertDialog.setMessage("Player "+(position+1)+ " gamepad is autodetected! You need to disable autodetection to change keys for this player.");
-			alertDialog.show();
-		}
-		else
-		{
-		     startActivityForResult(new Intent(this, ListKeys.class).putExtra(
-				"playerIndex", playerIndex), 0);
-		}
-	}
+        drawListAdapter();
+    }
 
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
+    private void drawListAdapter() {
+        final Context context = this;
 
-		drawListAdapter();
-	}
+        ArrayAdapter<String> keyLabelsAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, DefineKeys.playerLabels) {
+            @Override
+            public View getView(final int position, final View convertView,
+                                final ViewGroup parent) {
+                final TextView textView = new TextView(context);
+                textView.setPadding(60, 0, 60, 0);
+                textView.setTextAppearance(context, R.style.ListText);
+                textView.setText(getItem(position));
+                return textView;
+            }
+        };
+
+        setListAdapter(keyLabelsAdapter);
+    }
+
+    @Override
+    public void onListItemClick(ListView parent, View v, int position, long id) {
+        playerIndex = position;
+
+        boolean auto_detected = false;
+        try {
+            auto_detected = InputHandlerExt.deviceIDs[position] != -1;
+        } catch (Throwable e) {
+        }
+
+        if (auto_detected) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+            alertDialog.setTitle("GamePad Autodetect is enabled!");
+            alertDialog.setPositiveButton("Dismiss", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            alertDialog.setMessage("Player " + (position + 1) + " gamepad is autodetected! You need to disable autodetection to change keys for this player.");
+            alertDialog.show();
+        } else {
+            startActivityForResult(new Intent(this, ListKeys.class).putExtra(
+                    "playerIndex", playerIndex), 0);
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        drawListAdapter();
+    }
 }
 

@@ -56,223 +56,218 @@ import com.seleuco.mame4droid.MAME4droid;
 import com.seleuco.mame4droid.R;
 import com.seleuco.mame4droid.helpers.PrefsHelper;
 
-public class AnalogStick implements IController{
-	
-	float MY_PI	= 3.14159265f;
-		
-	Rect rStickArea = new Rect();
-	Rect stickPos = new Rect();
-	
-	//protected int stick_state;
-	
-	Point ptCur = new Point();
-	
-	Point ptCenter = new Point();
+public class AnalogStick implements IController {
+
+    float MY_PI = 3.14159265f;
+
+    Rect rStickArea = new Rect();
+    Rect stickPos = new Rect();
+
+    //protected int stick_state;
+
+    Point ptCur = new Point();
+
+    Point ptCenter = new Point();
     Point ptMin = new Point();
     Point ptMax = new Point();
-    
+
     int stickWidth;
     int stickHeight;
-    
+
     float deadZone = 0.1f;
 
-	float ang;						/**< angle the joystick is being held		*/
-	float mag;						/**< magnitude of the joystick (range 0-1)	*/
-	float rx, ry, oldRx, oldRy;
-	
-	int motion_pid = -1;
-	
-	static BitmapDrawable inner_img = null;
-	static BitmapDrawable outer_img = null;
-	static BitmapDrawable stick_images[] = null;
-		
-	protected MAME4droid mm = null;
-	
-	final public float rad2degree(float r){
-	   return ((r * 180.0f) / MY_PI);
-	}
-	
-	public void setMAME4droid(MAME4droid value) {
-		mm = value;
-		if(mm==null)return;
-		
-		if(inner_img==null)inner_img=(BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_inner);
-		if(outer_img==null)outer_img=(BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_outer);
-		if(stick_images==null)
-		{
-			stick_images = new BitmapDrawable[9];
-			stick_images[InputHandler.STICK_DOWN] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_down);
-			stick_images[InputHandler.STICK_DOWN_LEFT] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_down_left);
-			stick_images[InputHandler.STICK_DOWN_RIGHT] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_down_right);
-			stick_images[InputHandler.STICK_LEFT] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_left);
-			stick_images[InputHandler.STICK_NONE] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_none);
-			stick_images[InputHandler.STICK_RIGHT] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_right);
-			stick_images[InputHandler.STICK_UP] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_up);
-			stick_images[InputHandler.STICK_UP_LEFT] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_up_left);
-			stick_images[InputHandler.STICK_UP_RIGHT] = (BitmapDrawable)mm.getResources().getDrawable(R.drawable.stick_up_right);
-		}
-	}
+    float ang;
+    /**
+     * < angle the joystick is being held
+     */
+    float mag;
+    /**
+     * < magnitude of the joystick (range 0-1)
+     */
+    float rx, ry, oldRx, oldRy;
 
-	public int getMotionPid() {
-		return motion_pid;
-	}
-	
-	public void setStickArea(Rect rStickArea) {
-		 this.rStickArea = rStickArea;
-		 ptMin.x = rStickArea.left;
-		 ptMin.y = rStickArea.top;
-		 ptMax.x = rStickArea.right;
-		 ptMax.y = rStickArea.bottom;
-		 ptCenter.x = rStickArea.centerX();
-		 ptCenter.y = rStickArea.centerY();
-		 stickWidth =  (int)((float)rStickArea.width() * (62f/100.0f));//0.60;
-		 stickHeight = (int)((float)rStickArea.height() * (62f/100.0f));//0.60; 
-		 calculateStickPosition(ptCenter);
-	}
-	
-	protected int updateAnalog(int pad_data)
-	{	     
-		 switch(mm.getPrefsHelper().getAnalogDZ())
-	     {
-	       case 1: deadZone = 0.01f;break;
-	       case 2: deadZone = 0.1f;break;
-	       case 3: deadZone = 0.15f;break;
-	       case 4: deadZone = 0.2f;break;
-	       case 5: deadZone = 0.3f;break;
-	     }
-		 
-		 //System.out.println("ANALOG DEAD ZONE IS "+deadZone);
-	 
-	 	if(mag >= deadZone)
-	 	{
-			int ways = mm.getPrefsHelper().getStickWays();
-			if(ways==-1)ways = Emulator.getValue(Emulator.NUMWAYS);
-			boolean b = Emulator.isInMAME() && !Emulator.isInMenu();
-				
-			if(mm.getPrefsHelper().getControllerType() != PrefsHelper.PREF_DIGITAL_STICK)
-			{
-			   Emulator.setAnalogData(0,rx,ry * -1.0f);
-			}
-			
-	 		float v = ang;
-	 		
-	 		if(ways==2 && b)
-	 		{
-	             if ( v < 180  ){
-	 				pad_data |= RIGHT_VALUE;
-	                
-	 				pad_data &= ~UP_VALUE;
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~LEFT_VALUE;						
-	 			}
-	 			else if ( v >= 180  ){
-	 				pad_data |= LEFT_VALUE;
-	                
-	 				pad_data &= ~UP_VALUE;
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~RIGHT_VALUE;
-	 			}
-	 		}
-	 		else if(ways==4 /*&& b*/ || !b)
-	 		{
-	 			if( v >= 315 || v < 45){
-	 				pad_data |= DOWN_VALUE;
+    int motion_pid = -1;
 
-	                pad_data &= ~UP_VALUE;					        
-	 		        pad_data &= ~LEFT_VALUE;
-	 		        pad_data &= ~RIGHT_VALUE;						
-	 			}
-	 			else if ( v >= 45 && v < 135){
-	 				pad_data |= RIGHT_VALUE;
+    static BitmapDrawable inner_img = null;
+    static BitmapDrawable outer_img = null;
+    static BitmapDrawable stick_images[] = null;
 
-	                pad_data &= ~UP_VALUE;
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~LEFT_VALUE;						
-	 			}
-	 			else if ( v >= 135 && v < 225){
-	 				pad_data |= UP_VALUE;
+    protected MAME4droid mm = null;
 
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~LEFT_VALUE;
-	 		        pad_data &= ~RIGHT_VALUE;
-	 			}
-	 			else if ( v >= 225 && v < 315 ){
-	 				pad_data |= LEFT_VALUE;
+    final public float rad2degree(float r) {
+        return ((r * 180.0f) / MY_PI);
+    }
 
-	                pad_data &= ~UP_VALUE;
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~RIGHT_VALUE;
-	 			}						
-	 		}
-	        else
-	        {
-	 			if( v >= 330 || v < 30){
-	 				pad_data |= DOWN_VALUE;
+    public void setMAME4droid(MAME4droid value) {
+        mm = value;
+        if (mm == null) return;
 
-	                pad_data &= ~UP_VALUE;					        
-	 		        pad_data &= ~LEFT_VALUE;
-	 		        pad_data &= ~RIGHT_VALUE;						
-	 			}
-	 			else if ( v >= 30 && v <60  )  {
-	 				pad_data |= DOWN_VALUE;
-	 				pad_data |= RIGHT_VALUE;
+        if (inner_img == null)
+            inner_img = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_inner);
+        if (outer_img == null)
+            outer_img = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_outer);
+        if (stick_images == null) {
+            stick_images = new BitmapDrawable[9];
+            stick_images[InputHandler.STICK_DOWN] = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_down);
+            stick_images[InputHandler.STICK_DOWN_LEFT] = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_down_left);
+            stick_images[InputHandler.STICK_DOWN_RIGHT] = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_down_right);
+            stick_images[InputHandler.STICK_LEFT] = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_left);
+            stick_images[InputHandler.STICK_NONE] = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_none);
+            stick_images[InputHandler.STICK_RIGHT] = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_right);
+            stick_images[InputHandler.STICK_UP] = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_up);
+            stick_images[InputHandler.STICK_UP_LEFT] = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_up_left);
+            stick_images[InputHandler.STICK_UP_RIGHT] = (BitmapDrawable) mm.getResources().getDrawable(R.drawable.stick_up_right);
+        }
+    }
 
-	                pad_data &= ~UP_VALUE;
-	 		        pad_data &= ~LEFT_VALUE;						
-	 			}
-	 			else if ( v >= 60 && v < 120  ){
-	 				pad_data |= RIGHT_VALUE;
+    public int getMotionPid() {
+        return motion_pid;
+    }
 
-	                pad_data &= ~UP_VALUE;
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~LEFT_VALUE;						
-	 			}
-	 			else if ( v >= 120 && v < 150  ){
-	 				pad_data |= RIGHT_VALUE;
-	 				pad_data |= UP_VALUE;
+    public void setStickArea(Rect rStickArea) {
+        this.rStickArea = rStickArea;
+        ptMin.x = rStickArea.left;
+        ptMin.y = rStickArea.top;
+        ptMax.x = rStickArea.right;
+        ptMax.y = rStickArea.bottom;
+        ptCenter.x = rStickArea.centerX();
+        ptCenter.y = rStickArea.centerY();
+        stickWidth = (int) ((float) rStickArea.width() * (62f / 100.0f));//0.60;
+        stickHeight = (int) ((float) rStickArea.height() * (62f / 100.0f));//0.60;
+        calculateStickPosition(ptCenter);
+    }
 
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~LEFT_VALUE;
-	 			}
-	 			else if ( v >= 150 && v < 210  ){
-	 				pad_data |= UP_VALUE;
+    protected int updateAnalog(int pad_data) {
+        switch (mm.getPrefsHelper().getAnalogDZ()) {
+            case 1:
+                deadZone = 0.01f;
+                break;
+            case 2:
+                deadZone = 0.1f;
+                break;
+            case 3:
+                deadZone = 0.15f;
+                break;
+            case 4:
+                deadZone = 0.2f;
+                break;
+            case 5:
+                deadZone = 0.3f;
+                break;
+        }
 
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~LEFT_VALUE;
-	 		        pad_data &= ~RIGHT_VALUE;
-	 			}
-	 			else if ( v >= 210 && v < 240  ){
-	 				pad_data |= UP_VALUE;
-	 				pad_data |= LEFT_VALUE;
+        //System.out.println("ANALOG DEAD ZONE IS "+deadZone);
 
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~RIGHT_VALUE;						
-	 			}
-	 			else if ( v >= 240 && v < 300  ){
-	 				pad_data |= LEFT_VALUE;
+        if (mag >= deadZone) {
+            int ways = mm.getPrefsHelper().getStickWays();
+            if (ways == -1) ways = Emulator.getValue(Emulator.NUMWAYS);
+            boolean b = Emulator.isInMAME() && !Emulator.isInMenu();
 
-	                pad_data &= ~UP_VALUE;
-	 		        pad_data &= ~DOWN_VALUE;
-	 		        pad_data &= ~RIGHT_VALUE;
-	 			}
-	 			else if ( v >= 300 && v < 330  ){
-	 				pad_data |= LEFT_VALUE;
-	 				pad_data |= DOWN_VALUE;
-	 				
-	                pad_data &= ~UP_VALUE;
-	 		        pad_data &= ~RIGHT_VALUE;
-	 			}
-	 		}												
-	 	}
-	 	else
-	 	{
-	 		Emulator.setAnalogData(0,0.0f,0.0f);
-	 	     
-	 	    pad_data &= ~UP_VALUE;
-	 	    pad_data &= ~DOWN_VALUE;
-	 	    pad_data &= ~LEFT_VALUE;
-	 	    pad_data &= ~RIGHT_VALUE;		    	    				    
-	 	}
+            if (mm.getPrefsHelper().getControllerType() != PrefsHelper.PREF_DIGITAL_STICK) {
+                Emulator.setAnalogData(0, rx, ry * -1.0f);
+            }
+
+            float v = ang;
+
+            if (ways == 2 && b) {
+                if (v < 180) {
+                    pad_data |= RIGHT_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~LEFT_VALUE;
+                } else if (v >= 180) {
+                    pad_data |= LEFT_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~RIGHT_VALUE;
+                }
+            } else if (ways == 4 /*&& b*/ || !b) {
+                if (v >= 315 || v < 45) {
+                    pad_data |= DOWN_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~LEFT_VALUE;
+                    pad_data &= ~RIGHT_VALUE;
+                } else if (v >= 45 && v < 135) {
+                    pad_data |= RIGHT_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~LEFT_VALUE;
+                } else if (v >= 135 && v < 225) {
+                    pad_data |= UP_VALUE;
+
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~LEFT_VALUE;
+                    pad_data &= ~RIGHT_VALUE;
+                } else if (v >= 225 && v < 315) {
+                    pad_data |= LEFT_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~RIGHT_VALUE;
+                }
+            } else {
+                if (v >= 330 || v < 30) {
+                    pad_data |= DOWN_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~LEFT_VALUE;
+                    pad_data &= ~RIGHT_VALUE;
+                } else if (v >= 30 && v < 60) {
+                    pad_data |= DOWN_VALUE;
+                    pad_data |= RIGHT_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~LEFT_VALUE;
+                } else if (v >= 60 && v < 120) {
+                    pad_data |= RIGHT_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~LEFT_VALUE;
+                } else if (v >= 120 && v < 150) {
+                    pad_data |= RIGHT_VALUE;
+                    pad_data |= UP_VALUE;
+
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~LEFT_VALUE;
+                } else if (v >= 150 && v < 210) {
+                    pad_data |= UP_VALUE;
+
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~LEFT_VALUE;
+                    pad_data &= ~RIGHT_VALUE;
+                } else if (v >= 210 && v < 240) {
+                    pad_data |= UP_VALUE;
+                    pad_data |= LEFT_VALUE;
+
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~RIGHT_VALUE;
+                } else if (v >= 240 && v < 300) {
+                    pad_data |= LEFT_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~DOWN_VALUE;
+                    pad_data &= ~RIGHT_VALUE;
+                } else if (v >= 300 && v < 330) {
+                    pad_data |= LEFT_VALUE;
+                    pad_data |= DOWN_VALUE;
+
+                    pad_data &= ~UP_VALUE;
+                    pad_data &= ~RIGHT_VALUE;
+                }
+            }
+        } else {
+            Emulator.setAnalogData(0, 0.0f, 0.0f);
+
+            pad_data &= ~UP_VALUE;
+            pad_data &= ~DOWN_VALUE;
+            pad_data &= ~LEFT_VALUE;
+            pad_data &= ~RIGHT_VALUE;
+        }
 /*	 					
 	 	switch (pad_data & (UP_VALUE|DOWN_VALUE|LEFT_VALUE|RIGHT_VALUE))
 	    {
@@ -288,186 +283,161 @@ public class AnalogStick implements IController{
 	             
 	         default: stick_state = STICK_NONE;
 	    }	
-*/	 	
-	 	return pad_data;
-	}
-	 
-	protected void calculateStickState(Point pt, Point min, Point max, Point center)
-	{
-	    if(pt.x > max.x)pt.x=max.x;
-	    if(pt.x < min.x)pt.x=min.x;
-	    if(pt.y > max.y)pt.y=max.y;
-	    if(pt.y < min.y)pt.y=min.y;
+*/
+        return pad_data;
+    }
 
-		if (pt.x == center.x)
-			rx = 0;
-		else if (pt.x >= center.x)
-			rx = ((float)(pt.x - center.x) / (float)(max.x - center.x));
-		else
-			rx = ((float)(pt.x - min.x) / (float)(center.x - min.x)) - 1.0f;
+    protected void calculateStickState(Point pt, Point min, Point max, Point center) {
+        if (pt.x > max.x) pt.x = max.x;
+        if (pt.x < min.x) pt.x = min.x;
+        if (pt.y > max.y) pt.y = max.y;
+        if (pt.y < min.y) pt.y = min.y;
 
-		if (pt.y == center.y)
-			ry = 0;
-		else if (pt.y >= center.y)
-			ry = ((float)(pt.y - center.y) / (float)(max.y - center.y));
-		else
-			ry = ((float)(pt.y - min.y) / (float)(center.y - min.y)) - 1.0f;
+        if (pt.x == center.x)
+            rx = 0;
+        else if (pt.x >= center.x)
+            rx = ((float) (pt.x - center.x) / (float) (max.x - center.x));
+        else
+            rx = ((float) (pt.x - min.x) / (float) (center.x - min.x)) - 1.0f;
 
-		/* calculate the joystick angle and magnitude */
-		ang = rad2degree((float)Math.atan(ry / rx));
-		ang -= 90.0f;
-		if (rx < 0.0f)
-			ang -= 180.0f;
-		ang = Math.abs(ang);
-		mag = (float) Math.sqrt((rx * rx) + (ry * ry));
-		
-	}
-	
-	protected void calculateStickPosition(Point pt) 
-	{
-		int ways = mm.getPrefsHelper().getStickWays();
-		if(ways==-1)ways = Emulator.getValue(Emulator.NUMWAYS);
-		boolean b = Emulator.isInMAME() && !Emulator.isInMenu();
-		   
-	    if(ways==2 && b)
-	    {
-	       stickPos.left=  Math.min(ptMax.x-stickWidth,Math.max(ptMin.x,pt.x - (stickWidth/2)));
-	       stickPos.top =  ptCenter.y - (stickHeight/2);
-	    }
-	    else if(ways==4 /*&& b*/ || !b)
-	    {    
-	       if(mm.getInputHandler().getStick_state() == STICK_RIGHT || mm.getInputHandler().getStick_state() == STICK_LEFT)
-	       {
-	    	  stickPos.left =  Math.min(ptMax.x-stickWidth,Math.max(ptMin.x,pt.x - (stickWidth/2)));
-	    	  stickPos.top =  ptCenter.y - (stickHeight/2);
-	       }  
-	       else
-	       {
-	    	  stickPos.left =  ptCenter.x - (stickWidth/2);
-	    	  stickPos.top  =  Math.min(ptMax.y-stickHeight,Math.max(ptMin.y,pt.y - (stickHeight/2)));
-	       }
-	    }
-	    else
-	    {
-	    	 stickPos.left =  Math.min(ptMax.x-stickWidth,Math.max(ptMin.x,pt.x - (stickWidth/2)));
-	    	 stickPos.top =  Math.min(ptMax.y-stickHeight,Math.max(ptMin.y,pt.y - (stickHeight/2)));
-	    }
-	    
-	    stickPos.right = stickPos.left+stickWidth;
-	    stickPos.bottom = stickPos.top + stickHeight;
-	}
-	
-	public int handleMotion(MotionEvent event, int pad_data) {
-		
-		int pid = 0;
-		int action = event.getAction();
-		int actionEvent = action & MotionEvent.ACTION_MASK;
-		
-        try
-        {
-		   int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-           pid = event.getPointerId(pointerIndex);
+        if (pt.y == center.y)
+            ry = 0;
+        else if (pt.y >= center.y)
+            ry = ((float) (pt.y - center.y) / (float) (max.y - center.y));
+        else
+            ry = ((float) (pt.y - min.y) / (float) (center.y - min.y)) - 1.0f;
+
+        /* calculate the joystick angle and magnitude */
+        ang = rad2degree((float) Math.atan(ry / rx));
+        ang -= 90.0f;
+        if (rx < 0.0f)
+            ang -= 180.0f;
+        ang = Math.abs(ang);
+        mag = (float) Math.sqrt((rx * rx) + (ry * ry));
+
+    }
+
+    protected void calculateStickPosition(Point pt) {
+        int ways = mm.getPrefsHelper().getStickWays();
+        if (ways == -1) ways = Emulator.getValue(Emulator.NUMWAYS);
+        boolean b = Emulator.isInMAME() && !Emulator.isInMenu();
+
+        if (ways == 2 && b) {
+            stickPos.left = Math.min(ptMax.x - stickWidth, Math.max(ptMin.x, pt.x - (stickWidth / 2)));
+            stickPos.top = ptCenter.y - (stickHeight / 2);
+        } else if (ways == 4 /*&& b*/ || !b) {
+            if (mm.getInputHandler().getStick_state() == STICK_RIGHT || mm.getInputHandler().getStick_state() == STICK_LEFT) {
+                stickPos.left = Math.min(ptMax.x - stickWidth, Math.max(ptMin.x, pt.x - (stickWidth / 2)));
+                stickPos.top = ptCenter.y - (stickHeight / 2);
+            } else {
+                stickPos.left = ptCenter.x - (stickWidth / 2);
+                stickPos.top = Math.min(ptMax.y - stickHeight, Math.max(ptMin.y, pt.y - (stickHeight / 2)));
+            }
+        } else {
+            stickPos.left = Math.min(ptMax.x - stickWidth, Math.max(ptMin.x, pt.x - (stickWidth / 2)));
+            stickPos.top = Math.min(ptMax.y - stickHeight, Math.max(ptMin.y, pt.y - (stickHeight / 2)));
         }
-        catch(Throwable e)
-        {
-           pid = (action & MotionEvent.ACTION_POINTER_ID_SHIFT) >> MotionEvent.ACTION_POINTER_ID_SHIFT;
-        } 
-        
-		if( actionEvent == MotionEvent.ACTION_UP ||
-		    (actionEvent == MotionEvent.ACTION_POINTER_UP && pid == motion_pid) || 
-		    actionEvent == MotionEvent.ACTION_CANCEL || 
-		    (mm.getPrefsHelper().isLightgun() && 
-		     !(mm.getMainHelper().getscrOrientation() == Configuration.ORIENTATION_PORTRAIT &&  !mm.getPrefsHelper().isPortraitFullscreen()) 
-		     && Emulator.isInMAME() && !Emulator.isInMenu()))
-		{
-		       ptCur.x = ptCenter.x;
-		       ptCur.y = ptCenter.y;
-		       //stick_state = STICK_NONE;
-		       rx = ry = mag = 0;
-		       oldRx = oldRy = -999;
-		       motion_pid = -1;
-		}	
-		else
-		{
-			for (int i = 0; i < event.getPointerCount(); i++) {
-	
-				int  pointerId = event.getPointerId(i);
-				
-				int x = (int) event.getX(i);
-				int y = (int) event.getY(i);
-							
-				//if(actionEvent == MotionEvent.ACTION_DOWN || (actionEvent == MotionEvent.ACTION_POINTER_DOWN && pointerId==pid)) 
-				//{
-					if(rStickArea.contains(x, y) /*&& motion_pid==-1*/)
-					{
-						motion_pid = pointerId;
-					}
-				//}
-						
-				if(motion_pid == pointerId)
-				{					
-					ptCur.x = x;
-					ptCur.y = y;
-					calculateStickState(ptCur,ptMin,ptMax,ptCenter);
-				}
-			}
-		}
-	   
-		//if(motion_pid!=-1)
-		   pad_data = updateAnalog(pad_data);
-		   
-		double inc = mm.getPrefsHelper().isDebugEnabled() ? 0.01 : 0.08;   
-	    
-	    if((Math.abs(oldRx - rx) >= inc || Math.abs(oldRy - ry) >= inc) && mm.getPrefsHelper().isAnimatedInput() )
-	    {
-	      oldRx = rx;
-	      oldRy = ry;
-	      
-	      calculateStickPosition((mag >= deadZone ? ptCur : ptCenter));      
-	      
-	      if(mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_ANALOG_PRETTY)
-	      {
-		      if(Emulator.isDebug())
-		    	mm.getInputView().invalidate();
-		      else
-		        mm.getInputView().invalidate(rStickArea);
-	      }
-	    }  
-	    
-		return pad_data;
-	}
-	
-	public void draw(Canvas canvas) {
-		
-		TiltSensor tiltSensor = mm.getInputHandler().getTiltSensor();
-		
-		if( mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_ANALOG_PRETTY && !tiltSensor.isEnabled())
-		{
-			if(mm.getMainHelper().getscrOrientation() == Configuration.ORIENTATION_LANDSCAPE ||
-			  mm.getMainHelper().getscrOrientation() == Configuration.ORIENTATION_PORTRAIT && Emulator.isPortraitFull()
-					)
-			{
-				outer_img.setBounds(rStickArea);
-				outer_img.setAlpha(mm.getInputHandler().getOpacity());
-				outer_img.draw(canvas);
-			}
-			inner_img.setBounds(stickPos);
-			inner_img.setAlpha(mm.getInputHandler().getOpacity());
-			inner_img.draw(canvas);
-		}
-		else if( mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_ANALOG_FAST || mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_DIGITAL_STICK ||
-				 (mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_ANALOG_PRETTY && tiltSensor.isEnabled())
-				)
-		{
-			stick_images[mm.getInputHandler().getStick_state()].setBounds(rStickArea);
-			stick_images[mm.getInputHandler().getStick_state()].setAlpha(mm.getInputHandler().getOpacity());
-			stick_images[mm.getInputHandler().getStick_state()].draw(canvas);
-		}
-		
-        if(Emulator.isDebug())
-        {
-			canvas.drawText("x="+ptCur.x+" y="+ptCur.y+" state="+mm.getInputHandler().getStick_state()+" rx="+rx+" ry="+ry+" ang="+ang+" mag="+mag, 5,  50, Emulator.getDebugPaint());
-        }	
-	}	
-	
+
+        stickPos.right = stickPos.left + stickWidth;
+        stickPos.bottom = stickPos.top + stickHeight;
+    }
+
+    public int handleMotion(MotionEvent event, int pad_data) {
+
+        int pid = 0;
+        int action = event.getAction();
+        int actionEvent = action & MotionEvent.ACTION_MASK;
+
+        try {
+            int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+            pid = event.getPointerId(pointerIndex);
+        } catch (Throwable e) {
+            pid = (action & MotionEvent.ACTION_POINTER_ID_SHIFT) >> MotionEvent.ACTION_POINTER_ID_SHIFT;
+        }
+
+        if (actionEvent == MotionEvent.ACTION_UP ||
+                (actionEvent == MotionEvent.ACTION_POINTER_UP && pid == motion_pid) ||
+                actionEvent == MotionEvent.ACTION_CANCEL ||
+                (mm.getPrefsHelper().isLightgun() &&
+                        !(mm.getMainHelper().getscrOrientation() == Configuration.ORIENTATION_PORTRAIT && !mm.getPrefsHelper().isPortraitFullscreen())
+                        && Emulator.isInMAME() && !Emulator.isInMenu())) {
+            ptCur.x = ptCenter.x;
+            ptCur.y = ptCenter.y;
+            //stick_state = STICK_NONE;
+            rx = ry = mag = 0;
+            oldRx = oldRy = -999;
+            motion_pid = -1;
+        } else {
+            for (int i = 0; i < event.getPointerCount(); i++) {
+
+                int pointerId = event.getPointerId(i);
+
+                int x = (int) event.getX(i);
+                int y = (int) event.getY(i);
+
+                //if(actionEvent == MotionEvent.ACTION_DOWN || (actionEvent == MotionEvent.ACTION_POINTER_DOWN && pointerId==pid))
+                //{
+                if (rStickArea.contains(x, y) /*&& motion_pid==-1*/) {
+                    motion_pid = pointerId;
+                }
+                //}
+
+                if (motion_pid == pointerId) {
+                    ptCur.x = x;
+                    ptCur.y = y;
+                    calculateStickState(ptCur, ptMin, ptMax, ptCenter);
+                }
+            }
+        }
+
+        //if(motion_pid!=-1)
+        pad_data = updateAnalog(pad_data);
+
+        double inc = mm.getPrefsHelper().isDebugEnabled() ? 0.01 : 0.08;
+
+        if ((Math.abs(oldRx - rx) >= inc || Math.abs(oldRy - ry) >= inc) && mm.getPrefsHelper().isAnimatedInput()) {
+            oldRx = rx;
+            oldRy = ry;
+
+            calculateStickPosition((mag >= deadZone ? ptCur : ptCenter));
+
+            if (mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_ANALOG_PRETTY) {
+                if (Emulator.isDebug())
+                    mm.getInputView().invalidate();
+                else
+                    mm.getInputView().invalidate(rStickArea);
+            }
+        }
+
+        return pad_data;
+    }
+
+    public void draw(Canvas canvas) {
+
+        TiltSensor tiltSensor = mm.getInputHandler().getTiltSensor();
+
+        if (mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_ANALOG_PRETTY && !tiltSensor.isEnabled()) {
+            if (mm.getMainHelper().getscrOrientation() == Configuration.ORIENTATION_LANDSCAPE ||
+                    mm.getMainHelper().getscrOrientation() == Configuration.ORIENTATION_PORTRAIT && Emulator.isPortraitFull()
+            ) {
+                outer_img.setBounds(rStickArea);
+                outer_img.setAlpha(mm.getInputHandler().getOpacity());
+                outer_img.draw(canvas);
+            }
+            inner_img.setBounds(stickPos);
+            inner_img.setAlpha(mm.getInputHandler().getOpacity());
+            inner_img.draw(canvas);
+        } else if (mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_ANALOG_FAST || mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_DIGITAL_STICK ||
+                (mm.getPrefsHelper().getControllerType() == PrefsHelper.PREF_ANALOG_PRETTY && tiltSensor.isEnabled())
+        ) {
+            stick_images[mm.getInputHandler().getStick_state()].setBounds(rStickArea);
+            stick_images[mm.getInputHandler().getStick_state()].setAlpha(mm.getInputHandler().getOpacity());
+            stick_images[mm.getInputHandler().getStick_state()].draw(canvas);
+        }
+
+        if (Emulator.isDebug()) {
+            canvas.drawText("x=" + ptCur.x + " y=" + ptCur.y + " state=" + mm.getInputHandler().getStick_state() + " rx=" + rx + " ry=" + ry + " ang=" + ang + " mag=" + mag, 5, 50, Emulator.getDebugPaint());
+        }
+    }
+
 }

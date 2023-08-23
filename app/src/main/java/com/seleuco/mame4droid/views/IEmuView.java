@@ -47,8 +47,10 @@ package com.seleuco.mame4droid.views;
 import com.seleuco.mame4droid.MAME4droid;
 
 public interface IEmuView {
-	
-	public void setMAME4droid(MAME4droid mm);
-	public void setScaleType(int scaleType);
-	public int getScaleType();	
+
+    public void setMAME4droid(MAME4droid mm);
+
+    public void setScaleType(int scaleType);
+
+    public int getScaleType();
 }

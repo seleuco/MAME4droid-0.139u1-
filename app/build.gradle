@@ -1,19 +1,34 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.seleuco.mame4droid"
         minSdkVersion 9
-        targetSdkVersion 29
-        versionCode 52
-        versionName '1.15.6'
+        targetSdkVersion 33
+        versionCode 55
+        versionName '1.16.3'
         setProperty("archivesBaseName", "MAME4droid 0.139u1-$versionName")
         ndk {
             moduleName "mame4droid-jni"
             abiFilters "armeabi-v7a", "arm64-v8a"
+        }
+    }
+
+    bundle {
+        language {
+            // This property is set to true by default.
+            enableSplit = false
+        }
+        density {
+            // This property is set to true by default.
+            enableSplit = false
+        }
+        abi {
+            // This property is set to true by default.
+            enableSplit = false
         }
     }
 
@@ -28,4 +43,7 @@ android {
             path file('src/main/jni/Android.mk')
         }
     }
+}
+
+dependencies {
 }

@@ -54,71 +54,72 @@ import com.seleuco.mame4droid.R;
 import com.seleuco.mame4droid.input.InputHandler;
 
 public class MenuHelper {
-	
-	protected MAME4droid mm = null;
-	
-	public MenuHelper(MAME4droid value){
-		mm = value;
-	}
-	
-	public boolean createOptionsMenu(Menu menu) {
-		
-		MenuInflater inflater = mm.getMenuInflater();		
-		inflater.inflate(R.menu.menu, menu);        
-		
-		return true;		
-	}
-	
-	public boolean prepareOptionsMenu(Menu menu) {
-		
-		return true;
-	}
 
-	public boolean optionsItemSelected(MenuItem item) {
-	
-		switch (item.getItemId()) {
+    protected MAME4droid mm = null;
 
-		case (R.id.menu_quit_option):
-			 mm.showDialog(DialogHelper.DIALOG_EXIT);
-			return true;
-		case (R.id.menu_quit_game_option):
-			if(Emulator.isInMAME())
-			{
-		       if(!Emulator.isInMenu())
-				  mm.showDialog(DialogHelper.DIALOG_EXIT_GAME);
-		       else
-		       {
-		           Emulator.setValue(Emulator.EXIT_GAME_KEY, 1);		    	
-		    	   try {Thread.sleep(100);} catch (InterruptedException e) {}
-				   Emulator.setValue(Emulator.EXIT_GAME_KEY, 0);
-		       }
-			}
-			return true;			
-		case R.id.menu_options_option:
-			 mm.showDialog(DialogHelper.DIALOG_OPTIONS);
-			return true;		
-		case R.id.vkey_A:
-			mm.getInputHandler().handleVirtualKey(InputHandler.C_VALUE);
-			return true;
-		case R.id.vkey_B:
-			mm.getInputHandler().handleVirtualKey(InputHandler.A_VALUE);
-			return true;
-		case R.id.vkey_X:
-			mm.getInputHandler().handleVirtualKey(InputHandler.B_VALUE);
-			return true;
-		case R.id.vkey_Y:
-			mm.getInputHandler().handleVirtualKey(InputHandler.D_VALUE);
-			return true;
-		case R.id.vkey_MENU:
-			mm.getInputHandler().handleVirtualKey(InputHandler.START_VALUE);
-			return true;
-		case R.id.vkey_SELECT:
-			mm.getInputHandler().handleVirtualKey(InputHandler.COIN_VALUE);
-			return true;
-		}
+    public MenuHelper(MAME4droid value) {
+        mm = value;
+    }
 
-		return false;
+    public boolean createOptionsMenu(Menu menu) {
 
-	}
+        MenuInflater inflater = mm.getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+
+        return true;
+    }
+
+    public boolean prepareOptionsMenu(Menu menu) {
+
+        return true;
+    }
+
+    public boolean optionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case (R.id.menu_quit_option):
+                mm.showDialog(DialogHelper.DIALOG_EXIT);
+                return true;
+            case (R.id.menu_quit_game_option):
+                if (Emulator.isInMAME()) {
+                    if (!Emulator.isInMenu())
+                        mm.showDialog(DialogHelper.DIALOG_EXIT_GAME);
+                    else {
+                        Emulator.setValue(Emulator.EXIT_GAME_KEY, 1);
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                        }
+                        Emulator.setValue(Emulator.EXIT_GAME_KEY, 0);
+                    }
+                }
+                return true;
+            case R.id.menu_options_option:
+                mm.showDialog(DialogHelper.DIALOG_OPTIONS);
+                return true;
+            case R.id.vkey_A:
+                mm.getInputHandler().handleVirtualKey(InputHandler.C_VALUE);
+                return true;
+            case R.id.vkey_B:
+                mm.getInputHandler().handleVirtualKey(InputHandler.A_VALUE);
+                return true;
+            case R.id.vkey_X:
+                mm.getInputHandler().handleVirtualKey(InputHandler.B_VALUE);
+                return true;
+            case R.id.vkey_Y:
+                mm.getInputHandler().handleVirtualKey(InputHandler.D_VALUE);
+                return true;
+            case R.id.vkey_MENU:
+                mm.getInputHandler().handleVirtualKey(InputHandler.START_VALUE);
+                return true;
+            case R.id.vkey_SELECT:
+                mm.getInputHandler().handleVirtualKey(InputHandler.COIN_VALUE);
+                return true;
+        }
+
+        return false;
+
+    }
 
 }

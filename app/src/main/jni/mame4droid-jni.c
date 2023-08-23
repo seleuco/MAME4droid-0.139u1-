@@ -30,6 +30,7 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <android/log.h>
 
 #include <math.h>
@@ -59,6 +60,8 @@ void  (*droid_video_thread)()=NULL;
 int (*netplayInit)(const char *value, int i, int j)=NULL;
 void (*setNetplayCallbacks)(void *func1) = NULL;
 
+void (*setSAFCallbacks)(void *func1,void *func2,void *func3,void *func4) = NULL;
+
 /* Callbacks to Android */
 jmethodID android_dumpVideo;
 jmethodID android_changeVideo;
@@ -66,6 +69,10 @@ jmethodID android_openAudio;
 jmethodID android_dumpAudio;
 jmethodID android_closeAudio;
 jmethodID android_netplayWarn;
+jmethodID android_safOpenFile;
+jmethodID android_safReadDir;
+jmethodID android_safGetNextDirEntry;
+jmethodID android_safCloseDir;
 
 static JavaVM *jVM = NULL;
 static void *libdl = NULL;
@@ -83,15 +90,14 @@ static pthread_t main_tid;
 
 static void load_lib(const char *str)
 {
-
     char str2[256];
     
     strcpy(str2,str);
     strcpy(str2+strlen(str),"/libMAME4droid.so");
 
-#ifdef DEBUG
+//#ifdef DEBUG
     __android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "Attempting to load %s\n", str2);
-#endif
+//#endif
 
     if(libdl!=NULL)
         return;
@@ -141,6 +147,9 @@ static void load_lib(const char *str)
     
     setNetplayCallbacks = dlsym(libdl, "setNetplayCallbacks");
      __android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni","setNetplayCallbacks %d\n", setNetplayCallbacks!=NULL);
+
+    setSAFCallbacks = dlsym(libdl, "setSAFCallbacks");
+    __android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni","setSAFCallbacks %d\n", setSAFCallbacks!=NULL);
 }
 
 void myJNI_initVideo(void *buffer, int width, int height, int pitch)
@@ -284,6 +293,133 @@ void myJNI_netplayWarn(char *msg)
    //(*env)->DeleteLocalRef(env, jstrBuf);
 }
 
+int myJNI_safOpenFile(char *pathName,char *mode)
+{
+    JNIEnv *env;
+    (*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4);
+    int attached  = 0;
+
+#ifdef DEBUG
+//    __android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "safOpenFile");
+#endif
+    if(pathName!=NULL)
+    {
+        //__android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "safOpen %s %s\n",pathName,mode);
+        if(env==NULL)
+        {
+            attached  = 1;
+            (*jVM)->AttachCurrentThread(jVM,(void *) &env, NULL);
+        }
+
+        jstring jstrBuf1 = (*env)->NewStringUTF(env, pathName);
+        jstring jstrBuf2 = (*env)->NewStringUTF(env, mode);
+        jint ret =(*env)->CallStaticIntMethod(env, cEmulator, android_safOpenFile, jstrBuf1,jstrBuf2);
+
+        if(attached)
+            (*jVM)->DetachCurrentThread(jVM);
+
+        return ret;
+    }
+    return -1;
+    //(*env)->DeleteLocalRef(env, jstrBuf);
+}
+
+int myJNI_safReadDir(char *dirName, int reload)
+{
+    JNIEnv *env;
+    (*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4);
+    int attached  = 0;
+
+#ifdef DEBUG
+    //__android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "safReadDir");
+#endif
+    if(dirName!=NULL)
+    {
+        //__android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "safReadDir %s reload %d\n",dirName, reload);
+        if(env==NULL)
+        {
+            attached  = 1;
+            (*jVM)->AttachCurrentThread(jVM,(void *) &env, NULL);
+        }
+
+        jstring jstrBuf = (*env)->NewStringUTF(env, dirName);
+        jint ret =(*env)->CallStaticIntMethod(env, cEmulator, android_safReadDir, jstrBuf, reload);
+
+        if(attached)
+            (*jVM)->DetachCurrentThread(jVM);
+
+        return ret;
+    }
+    return 0;
+    //(*env)->DeleteLocalRef(env, jstrBuf);
+}
+
+char *myJNI_safGetNextDirEntry(int id)
+{
+    JNIEnv *env;
+    (*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4);
+    int attached  = 0;
+
+#ifdef DEBUG
+    //__android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "safGetNextDirEntry");
+#endif
+    if(id!=0)
+    {
+        //__android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "safGetNextDirEntry %d\n",id);
+        if(env==NULL)
+        {
+            attached  = 1;
+            (*jVM)->AttachCurrentThread(jVM,(void *) &env, NULL);
+        }
+
+        jstring ret =(*env)->CallStaticObjectMethod(env, cEmulator, android_safGetNextDirEntry, id);
+
+        char *str = NULL;
+
+        if(ret!=NULL)
+        {
+            char *tmp = (char *) (*env)->GetStringUTFChars(env, ret, 0);
+            str = (char*)malloc(strlen(tmp)+1);
+            strcpy(str,tmp);
+            (*env)->ReleaseStringUTFChars(env, ret, tmp);
+        }
+
+        if(attached)
+            (*jVM)->DetachCurrentThread(jVM);
+
+        return str;
+    }
+    return NULL;
+    //(*env)->DeleteLocalRef(env, jstrBuf);
+}
+
+void myJNI_safCloseDir(int id)
+{
+    JNIEnv *env;
+    (*jVM)->GetEnv(jVM, (void**) &env, JNI_VERSION_1_4);
+    int attached  = 0;
+
+#ifdef DEBUG
+    //__android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "safCloseDir");
+#endif
+    if(id!=0)
+    {
+        //__android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "safCloseDir %d\n",id);
+        if(env==NULL)
+        {
+            attached  = 1;
+            (*jVM)->AttachCurrentThread(jVM,(void *) &env, NULL);
+        }
+
+        (*env)->CallStaticVoidMethod(env, cEmulator, android_safCloseDir, id);
+
+        if(attached)
+            (*jVM)->DetachCurrentThread(jVM);
+    }
+
+    //(*env)->DeleteLocalRef(env, jstrBuf);
+}
+
 int JNI_OnLoad(JavaVM* vm, void* reserved)
 {
     JNIEnv *env;
@@ -357,7 +493,39 @@ int JNI_OnLoad(JavaVM* vm, void* reserved)
         __android_log_print(ANDROID_LOG_ERROR, "mame4droid-jni", "Failed to find method netplayWarn");
         return -1;
     }
-   
+
+    android_safOpenFile = (*env)->GetStaticMethodID(env,cEmulator,"safOpenFile","(Ljava/lang/String;Ljava/lang/String;)I");
+
+    if(android_safOpenFile==NULL)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, "mame4droid-jni", "Failed to find method safOpenFile");
+        return -1;
+    }
+
+    android_safReadDir = (*env)->GetStaticMethodID(env,cEmulator,"safReadDir","(Ljava/lang/String;I)I");
+
+    if(android_safReadDir==NULL)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, "mame4droid-jni", "Failed to find method safReadDir");
+        return -1;
+    }
+
+    android_safGetNextDirEntry = (*env)->GetStaticMethodID(env,cEmulator,"safGetNextDirEntry","(I)Ljava/lang/String;");
+
+    if(android_safGetNextDirEntry==NULL)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, "mame4droid-jni", "Failed to find method safGetNextDirEntry");
+        return -1;
+    }
+
+    android_safCloseDir = (*env)->GetStaticMethodID(env,cEmulator,"safCloseDir","(I)V");
+
+    if(android_safCloseDir==NULL)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, "mame4droid-jni", "Failed to find method safCloseDir");
+        return -1;
+    }
+
     return JNI_VERSION_1_4;
 }
 
@@ -389,7 +557,11 @@ JNIEXPORT void JNICALL Java_com_seleuco_mame4droid_Emulator_init
 
     __android_log_print(ANDROID_LOG_INFO, "mame4droid-jni","calling setNetplayCallbacks");
     if(setNetplayCallbacks!=NULL)
-       setNetplayCallbacks(&myJNI_netplayWarn);
+        setNetplayCallbacks(&myJNI_netplayWarn);
+
+    __android_log_print(ANDROID_LOG_INFO, "mame4droid-jni","calling setSAFCallbacks");
+    if(setSAFCallbacks!=NULL)
+        setSAFCallbacks(&myJNI_safOpenFile,&myJNI_safReadDir,&myJNI_safGetNextDirEntry,&myJNI_safCloseDir);
 
     const char *str2 = (*env)->GetStringUTFChars(env, s2, 0);
 
@@ -526,17 +698,19 @@ JNIEXPORT jint JNICALL Java_com_seleuco_mame4droid_Emulator_netplayInit
 #ifdef DEBUG
     __android_log_print(ANDROID_LOG_DEBUG, "mame4droid-jni", "netplayInit");
 #endif
+    int res = -1;
     if(droid_video_thread!=NULL)    
     {     
         const char *str = NULL;
         if(addr!=NULL)
            str = (*env)->GetStringUTFChars(env, addr, 0);
-        netplayInit(str,port,join);
+        res = netplayInit(str,port,join);
         if(addr!=NULL)
            (*env)->ReleaseStringUTFChars(env, addr, str);
     }
     else
       __android_log_print(ANDROID_LOG_WARN, "mame4droid-jni", "error no netplayInit!");
+    return res;
 }
 
 

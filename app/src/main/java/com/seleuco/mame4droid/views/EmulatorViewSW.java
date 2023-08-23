@@ -59,86 +59,85 @@ import com.seleuco.mame4droid.MAME4droid;
 import com.seleuco.mame4droid.helpers.PrefsHelper;
 
 
-public class EmulatorViewSW extends SurfaceView implements Callback, IEmuView{
-	
-	protected int scaleType = PrefsHelper.PREF_ORIGINAL;
-	
-	protected MAME4droid mm = null;
+public class EmulatorViewSW extends SurfaceView implements Callback, IEmuView {
 
-	public int getScaleType() {
-		return scaleType;
-	}
+    protected int scaleType = PrefsHelper.PREF_ORIGINAL;
 
-	public void setScaleType(int scaleType) {
-		this.scaleType = scaleType;
-	}
+    protected MAME4droid mm = null;
 
-	public void setMAME4droid(MAME4droid mm) {
-		this.mm = mm;
-	}
-	
-	public EmulatorViewSW(Context context) {
-		super(context);
-		init();
-	}
+    public int getScaleType() {
+        return scaleType;
+    }
 
-	public EmulatorViewSW(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init();
-	}
+    public void setScaleType(int scaleType) {
+        this.scaleType = scaleType;
+    }
 
-	public EmulatorViewSW(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		init();
+    public void setMAME4droid(MAME4droid mm) {
+        this.mm = mm;
+    }
 
-	}
-	
-	protected void init(){
-		this.getHolder().addCallback(this);			
-		this.setFocusable(true);
-		this.setFocusableInTouchMode(true);
-		this.requestFocus();
-	}
-		
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		if(mm==null)
-		{
-			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-			return;
-		}
-		ArrayList<Integer> l = mm.getMainHelper().measureWindow(widthMeasureSpec, heightMeasureSpec, scaleType);
-		setMeasuredDimension(l.get(0).intValue(),l.get(1).intValue());
-	}
-		
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    public EmulatorViewSW(Context context) {
+        super(context);
+        init();
+    }
 
-		super.onSizeChanged(w, h, oldw, oldh);
-		Emulator.setWindowSize(w, h);		
-	}
+    public EmulatorViewSW(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
 
-	//@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		//Emulator.setHolder(holder);		
-	}
+    public EmulatorViewSW(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        init();
 
-	//@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		//Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-		Log.d("Thread Video", "Surface created ****"+holder+ "**** "+this);	
-		Emulator.setHolder(holder);		
-	}
+    }
 
-	//@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		Log.d("Thread Video", "Surface destroyed *****"+holder+"*** "+this);
-		Emulator.setHolder(null);		
-	}
-	
-	@Override
-	public boolean onTrackballEvent(MotionEvent event) {
-		return mm.getInputHandler().onTrackballEvent(event);
-	}
+    protected void init() {
+        this.getHolder().addCallback(this);
+        this.setFocusable(true);
+        this.setFocusableInTouchMode(true);
+        this.requestFocus();
+    }
+
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (mm == null) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
+        ArrayList<Integer> l = mm.getMainHelper().measureWindow(widthMeasureSpec, heightMeasureSpec, scaleType);
+        setMeasuredDimension(l.get(0).intValue(), l.get(1).intValue());
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+
+        super.onSizeChanged(w, h, oldw, oldh);
+        Emulator.setWindowSize(w, h);
+    }
+
+    //@Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width,
+                               int height) {
+        //Emulator.setHolder(holder);
+    }
+
+    //@Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+        Log.d("Thread Video", "Surface created ****" + holder + "**** " + this);
+        Emulator.setHolder(holder);
+    }
+
+    //@Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        Log.d("Thread Video", "Surface destroyed *****" + holder + "*** " + this);
+        Emulator.setHolder(null);
+    }
+
+    @Override
+    public boolean onTrackballEvent(MotionEvent event) {
+        return mm.getInputHandler().onTrackballEvent(event);
+    }
 
 }
