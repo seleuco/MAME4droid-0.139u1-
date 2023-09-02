@@ -673,7 +673,7 @@ public class Emulator {
 
                     Log.d("", "URI = " + _uri);
                     try {
-                        if (_uri != null && "content".equals(_uri.getScheme())) {
+                        if (_uri != null && "content".equalsIgnoreCase(_uri.getScheme())) {
 						  	  /*
 							  Cursor cursor = mm.getContentResolver().query(_uri, new String[]{android.provider.MediaStore.Images.ImageColumns.DATA}, null, null, null);
 							  cursor.moveToFirst();
@@ -793,7 +793,7 @@ public class Emulator {
     }
 
     static int safOpenFile(String pathName, String mode) {
-        //System.out.println("Llaman a safOpenFile en java "+pathName+" "+mode);
+        //System.out.println("-->Llaman a safOpenFile en java "+pathName+" "+mode);
 
         String file = "";
 

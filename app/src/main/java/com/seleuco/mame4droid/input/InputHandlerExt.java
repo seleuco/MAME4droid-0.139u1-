@@ -100,16 +100,18 @@ public class InputHandlerExt extends InputHandler implements OnGenericMotionList
         int ids[] = InputDevice.getDeviceIds();
         for (int i = 0; i < ids.length; i++) {
             InputDevice id = InputDevice.getDevice(ids[i]);
-            System.out.println("name: " + id.getName());
-            System.out.println(id.toString());
+            if(id!=null) {
+                System.out.println("name: " + id.getName());
+                System.out.println(id.toString());
 
-            try {
-                Method method = id.getClass().getMethod("getControllerNumber");
-                if (method != null) {
-                    method.invoke(id);
-                    hasMethodControllerNumber = true;
+                try {
+                    Method method = id.getClass().getMethod("getControllerNumber");
+                    if (method != null) {
+                        method.invoke(id);
+                        hasMethodControllerNumber = true;
+                    }
+                } catch (Exception e) {
                 }
-            } catch (Exception e) {
             }
         }
 

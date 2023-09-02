@@ -437,7 +437,7 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener {
     }
 
     public int getControllerType() {
-        return Integer.valueOf(getSharedPreferences().getString(PREF_CONTROLLER_TYPE, "3")).intValue();
+        return Integer.valueOf(getSharedPreferences().getString(PREF_CONTROLLER_TYPE, "4")).intValue();
     }
 
     public boolean isLightgun() {

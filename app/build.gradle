@@ -8,8 +8,8 @@ android {
         applicationId "com.seleuco.mame4droid"
         minSdkVersion 9
         targetSdkVersion 33
-        versionCode 55
-        versionName '1.16.3'
+        versionCode 58
+        versionName '1.16.6'
         setProperty("archivesBaseName", "MAME4droid 0.139u1-$versionName")
         ndk {
             moduleName "mame4droid-jni"

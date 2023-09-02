@@ -74,6 +74,8 @@ import com.seleuco.mame4droid.input.InputHandlerFactory;
 import com.seleuco.mame4droid.views.IEmuView;
 import com.seleuco.mame4droid.views.InputView;
 
+import java.util.Objects;
+
 public class MAME4droid extends Activity {
 
     protected View emuView = null;
@@ -177,7 +179,7 @@ public class MAME4droid extends Activity {
     protected void initMame4droid() {
         if (!Emulator.isEmulating()) {
 
-            if (prefsHelper.getROMsDIR() == null || getPrefsHelper().isNotMigrated() /*migramos old installation*/ ) {
+            if (getPrefsHelper().getInstallationDIR()==null || prefsHelper.getROMsDIR() == null || getPrefsHelper().isNotMigrated() /*migramos old installation*/ ) {
                 if (DialogHelper.savedDialog == DialogHelper.DIALOG_NONE) {
 					if (Build.VERSION.SDK_INT >= 29 || getPrefsHelper().isNotMigrated() /* && getPrefsHelper().getInstallationDIR() == null && !getPrefsHelper().istOldInstallation()*/) {
                         if(getPrefsHelper().isNotMigrated())
@@ -185,31 +187,38 @@ public class MAME4droid extends Activity {
 					    showDialog(DialogHelper.DIALOG_ROMs_DIR_SDK29);
                     }
 					else {
-						if (!CheckPermissions())
+						if (!CheckPermissions(false))
 							return;
 						showDialog(DialogHelper.DIALOG_ROMs_DIR_LEGACY);
 					}
 				}
             } else { //roms dir no es null es que previamente hemos puesto "" o un path especifico. Venimos del recreate y si ha cambiado el installation path hay que actuzalizarlo
+                /*
                 if (!getPrefsHelper().getInstallationDIR().equals(getPrefsHelper().getOldInstallationDIR())) {
-                    if (!CheckPermissions())
+                    if (!CheckPermissions(true))//Forzamos en 29-32 por si se hace un cambio manual
                         return;
                 }
+                 */
+                if (!CheckPermissions(this.getMainHelper().isAndroidTV())) //nos han quitado los permisos
+                    return;
                 boolean res = getMainHelper().ensureInstallationDIR(mainHelper.getInstallationDIR());
                 if (res == false) {
-                    this.getPrefsHelper().setInstallationDIR(this.getPrefsHelper().getOldInstallationDIR());
+                    this.getPrefsHelper().setInstallationDIR(this.getPrefsHelper().getOldInstallationDIR());//revert
                 } else {
-                    runMAME4droid();
+                    runMAME4droid();//MAIN ENTRY POINT
                 }
             }
-            if (getIntent().getAction().equals(Intent.ACTION_VIEW))
-                if (!CheckPermissions())
+            if (Objects.equals(getIntent().getAction(), Intent.ACTION_VIEW)) {
+                if (!CheckPermissions(false)) //ES necesario forzarlo en 29-32?
                     return;
+            }
         }
     }
 
-    public Boolean CheckPermissions() {
-        if (Build.VERSION.SDK_INT >= 23 && Build.VERSION.SDK_INT <= 29) {
+    public Boolean CheckPermissions(boolean force) {
+        if ((Build.VERSION.SDK_INT >= 23 && Build.VERSION.SDK_INT < 29) || force) {
+            if(Build.VERSION.SDK_INT >= 30)
+                return true;
             // Marshmallow+ hasta android 10 (resto por SAF)
             if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {

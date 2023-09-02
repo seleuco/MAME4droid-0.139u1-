@@ -53,6 +53,8 @@ import android.provider.DocumentsContract;
 
 import com.seleuco.mame4droid.MAME4droid;
 
+import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -261,12 +263,49 @@ public class SAFHelper {
 
         //for(String s : pathSegment) { System.out.println("path segment: " + s); }
 
-        final String[] split = pathSegment.get(1).split(":");
-        final StorageVolume vol = findVolume(split[0]);
-        if (vol == null) {
+        if(pathSegment.size()<2)
             return null;
+
+        final String[] split = pathSegment.get(1).split(":");
+
+        String tmp = null;
+
+        if(split.length==2) {
+
+            final StorageVolume vol = findVolume(split[0]);
+            if (vol == null) {
+                return null;
+            }
+
+            try {
+                File f = vol.getDirectory(); //Cuidado produce NoSuchMethodExcption en Android10 en algunos devices. Edirectory where this volume is mounted, or null if the volume is not currently mounted.
+                if (f != null) {
+                    tmp = f.getAbsolutePath(); //SDK > 29
+                }
+            } catch (Throwable e) {
+                try {
+                    Method method = vol.getClass().getMethod("getPath");//SDK 29
+                    if (method != null) {
+                        tmp = (String) method.invoke(vol);
+                    }
+                } catch (Exception ee) {
+                }
+                //e.printStackTrace();
+                //tmp = "/"+vol.getDescription(mm);
+            }
+            if (tmp != null)
+                tmp += "/" + split[1];
         }
-        return vol.getDirectory().getAbsolutePath() + "/" + split[1];
+        else if(split.length==1)
+        {
+            if(!split[0].startsWith("/")) {
+                tmp = "/"+split[0];
+            }
+            else
+                tmp = split[0];
+        }
+
+        return tmp;
     }
 
     private static void closeQuietly(AutoCloseable closeable) {

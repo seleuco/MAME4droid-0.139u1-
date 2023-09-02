@@ -110,8 +110,8 @@ public class MainHelper {
     final public static int DEVICE_ANDROIDTV = 5;
 
     final public static int INSTALLATION_DIR_UNDEFINED = 1;
-    final public static int INSTALLATION_DIR_INTERNALFILES = 2;
-    final public static int INSTALLATION_DIR_EXTERNALSTORAGE = 3;
+    final public static int INSTALLATION_DIR_NEW_INTERNAL = 2;
+    final public static int INSTALLATION_DIR_LEGACY = 3;
 
     protected int installationDirType = INSTALLATION_DIR_UNDEFINED;
 
@@ -167,9 +167,9 @@ public class MainHelper {
         // android.os.Debug.waitForDebugger();
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
-            if (getInstallationDirType() == INSTALLATION_DIR_INTERNALFILES)
+            if (getInstallationDirType() == INSTALLATION_DIR_NEW_INTERNAL)
                 res_dir = mm.getExternalFilesDir(null).getAbsolutePath() + "/";
-            else if (getInstallationDirType() == INSTALLATION_DIR_EXTERNALSTORAGE)
+            else if (getInstallationDirType() == INSTALLATION_DIR_LEGACY)
                 res_dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MAME4droid/";
         }
         if (res_dir == null)
@@ -280,15 +280,31 @@ public class MainHelper {
 
                     new BufferedInputStream(fis));
             // Loop over all of the entries in the zip file
+/*
+InputStream is = new InputStream(untrustedFileName);
+ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is));
+while((ZipEntry ze = zis.getNextEntry()) != null) {
+  File f = new File(DIR, ze.getName());
+  String canonicalPath = f.getCanonicalPath();
+  if (!canonicalPath.startsWith(DIR)) {
+    // SecurityException
+  }
+  // Finish unzipping…
+}
+ */
+            String zip_dir = new File(roms_dir).getCanonicalPath();
             int count;
             byte data[] = new byte[BUFFER_SIZE];
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
-
-                    String destination = roms_dir;
-                    String destFN = destination + File.separator
-                            + entry.getName();
+                    File f = new File(zip_dir, entry.getName());
+                    String canonicalPath = f.getCanonicalPath();
+                    if (!canonicalPath.startsWith(zip_dir)) {
+                        throw new SecurityException("Error zip!!!!");
+                    }
+                    String destination = zip_dir;
+                    String destFN = destination + File.separator + entry.getName();
                     // Write the file to the file system
                     FileOutputStream fos = new FileOutputStream(destFN);
                     dest = new BufferedOutputStream(fos, BUFFER_SIZE);
@@ -298,7 +314,7 @@ public class MainHelper {
                     dest.flush();
                     dest.close();
                 } else {
-                    File f = new File(roms_dir + File.separator
+                    File f = new File(zip_dir+ File.separator
                             + entry.getName());
                     f.mkdirs();
                 }
@@ -800,7 +816,7 @@ galaxy sde	   --> 2560x1600 16:10
             mm.getDialogHelper()
                     .setInfoMsg(
                             "When MAME4droid is first run, it will create a folder structure for you on the internal memory of your Android device. This folder contains all the other folders MAME uses as well as some basic configuration files."
-                                    + "Since MAME4droid does not come with game ROM files, you will need to copy them to the '/sdcard/MAME4droid/roms' or 'Android/data/com.seleuco.mame4droid/files/roms' folder (" +
+                                    + "Since MAME4droid does not come with game ROM files, you will need to copy them to the selected or 'Android/data/com.seleuco.mame4droid/files/roms' folder (" +
                                     "the one that applies) yourself. These should be properly named, ZIPped MAME v1.39u1 ROMs files with the filenames in all lower case.\n\n Important: You should define or map your Android TV game controller on 'options/settings/input/External controller/define Keys' to avoid this help screen constantly showing if the controller is not auto detected.\n\n"
                                     + "Controls: Buttons A,B,C,D,E,F on the controller map to buttons Button MAME 1 to 6 buttons."
                                     + "Coin button inserts coin/adds credit.START button starts 1P game.START+UP starts 2P game. START+RIGHT starts 3P game. START+DOWN starts 4P game.SELECT+UP inserts 2P credits. SELECT+RIGHT inserts 3P credits. SELECT+DOWN inserts 4P credits."
@@ -851,9 +867,9 @@ galaxy sde	   --> 2560x1600 16:10
 
             String romsPath = mm.getSAFHelper().pathFromDocumentUri(uri);
             if (romsPath == null)
-                romsPath = "/ExternalStorage";
+                romsPath = "/Your_Selected_Folder";
 
-            mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_INTERNALFILES);
+            mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_NEW_INTERNAL);
             mm.getPrefsHelper().setROMsDIR(romsPath);
             mm.getPrefsHelper().setSAF_Uri(uri.toString());
             mm.getPrefsHelper().setIsNotMigrated(false);

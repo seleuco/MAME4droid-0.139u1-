@@ -46,8 +46,10 @@ package com.seleuco.mame4droid.helpers;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.view.View;
 
 import com.seleuco.mame4droid.Emulator;
@@ -134,9 +136,10 @@ public class DialogHelper {
                         .setCancelable(false)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                //MAME FILES AND ROMS FILES IN A FIXED DIR ON EXTERNAL STORAGE
                                 DialogHelper.savedDialog = DIALOG_NONE;
                                 mm.removeDialog(DIALOG_ROMs_DIR_LEGACY);
-                                mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_EXTERNALSTORAGE);
+                                mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_LEGACY);
                                 if (mm.getMainHelper().ensureInstallationDIR(mm.getMainHelper().getInstallationDIR())) {
                                     mm.getPrefsHelper().setROMsDIR("");
                                     mm.runMAME4droid();
@@ -145,8 +148,10 @@ public class DialogHelper {
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                //MAME FILES ON FIXED APP FOLDER AND ROMs ON CUSTOM FOLDER
                                 DialogHelper.savedDialog = DIALOG_NONE;
                                 mm.removeDialog(DIALOG_ROMs_DIR_LEGACY);
+                                mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_LEGACY);
                                 mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
                             }
                         });
@@ -170,7 +175,7 @@ public class DialogHelper {
                             public void onClick(DialogInterface dialog, int id) {
                                 DialogHelper.savedDialog = DIALOG_NONE;
                                 mm.removeDialog(DIALOG_ROMs_DIR_SDK29);
-                                mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_INTERNALFILES);
+                                mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_NEW_INTERNAL);
                                 mm.getPrefsHelper().setROMsDIR("");
                                 mm.getPrefsHelper().setIsNotMigrated(false);
                                 mm.runMAME4droid();
@@ -180,8 +185,30 @@ public class DialogHelper {
                             public void onClick(DialogInterface dialog, int id) {
                                 DialogHelper.savedDialog = DIALOG_NONE;
                                 mm.removeDialog(DIALOG_ROMs_DIR_SDK29);
-                                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                                mm.startActivityForResult(intent, MainHelper.REQUEST_CODE_OPEN_DIRECTORY);
+
+                                try {
+                                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                                    mm.startActivityForResult(intent, MainHelper.REQUEST_CODE_OPEN_DIRECTORY);
+                                    //throw new ActivityNotFoundException("TEST");
+                                }
+                                catch(ActivityNotFoundException e){
+                                    if(mm.getMainHelper().isAndroidTV() && Build.VERSION.SDK_INT <= 29 )
+                                    {
+                                        if(mm.CheckPermissions(true)) {
+                                            mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_NEW_INTERNAL);
+                                            mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
+                                        }
+                                    }
+                                    else {
+                                        mm.getDialogHelper().showMessage("Your device doesn't have the native android file manager needed to authorize external storage reading ... Debloated??",
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        android.os.Process.killProcess(android.os.Process.myPid());
+                                                    }
+                                                });
+                                    }
+                                }
                             }
                         });
                 dialog = builder.create();
