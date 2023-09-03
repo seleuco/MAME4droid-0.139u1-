@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.seleuco.mame4droid"
-      android:installLocation="preferExternal">
+    android:installLocation="preferExternal">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>      
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
     <uses-permission android:name="android.permission.VIBRATE"/>
