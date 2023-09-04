@@ -110,8 +110,9 @@ public class MainHelper {
     final public static int DEVICE_ANDROIDTV = 5;
 
     final public static int INSTALLATION_DIR_UNDEFINED = 1;
-    final public static int INSTALLATION_DIR_NEW_INTERNAL = 2;
+    final public static int INSTALLATION_DIR_FILES_DIR = 2;
     final public static int INSTALLATION_DIR_LEGACY = 3;
+    final public static int INSTALLATION_DIR_MEDIA_FOLDER = 4;
 
     protected int installationDirType = INSTALLATION_DIR_UNDEFINED;
 
@@ -167,10 +168,21 @@ public class MainHelper {
         // android.os.Debug.waitForDebugger();
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
-            if (getInstallationDirType() == INSTALLATION_DIR_NEW_INTERNAL)
+            if (getInstallationDirType() == INSTALLATION_DIR_FILES_DIR)
                 res_dir = mm.getExternalFilesDir(null).getAbsolutePath() + "/";
             else if (getInstallationDirType() == INSTALLATION_DIR_LEGACY)
                 res_dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MAME4droid/";
+            else if (getInstallationDirType() == INSTALLATION_DIR_MEDIA_FOLDER)
+            {
+                File[] dirs = mm.getExternalMediaDirs();
+                for(File d: dirs)
+                {
+                    if(d != null) {
+                        res_dir = d.getAbsolutePath() + "/";
+                        break;
+                    }
+                }
+            }
         }
         if (res_dir == null)
             res_dir = mm.getFilesDir().getAbsolutePath() + "/";
@@ -869,7 +881,7 @@ galaxy sde	   --> 2560x1600 16:10
             if (romsPath == null)
                 romsPath = "/Your_Selected_Folder";
 
-            mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_NEW_INTERNAL);
+            mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_FILES_DIR);
             mm.getPrefsHelper().setROMsDIR(romsPath);
             mm.getPrefsHelper().setSAF_Uri(uri.toString());
             mm.getPrefsHelper().setIsNotMigrated(false);
@@ -1140,7 +1152,8 @@ galaxy sde	   --> 2560x1600 16:10
             // System.out.println("OLD INTENT:"+oldintent.getAction());
             int flags = oldintent.getFlags();
 
-            //flags |=  PendingIntent.FLAG_IMMUTABLE;//67108864; //FLAG_IMMUTABLE
+            if(Build.VERSION.SDK_INT >= 33)//para que no saque error el UI
+               flags |=  PendingIntent.FLAG_IMMUTABLE;//67108864; //FLAG_IMMUTABLE
 
             PendingIntent intent = PendingIntent.getActivity(mm.getBaseContext(),
                     0, new Intent(oldintent), flags);

@@ -173,10 +173,11 @@ public class ListKeys extends ListActivity {
 			int androidGamePadID = data.getIntExtra("androidGamePadID", 0);
 			int iKeyCodeWithDeviceId = InputHandler.makeKeyCodeWithDeviceID(androidGamePadID, androidKeyCode);			
 			
-			for (int i = 0; i < InputHandler.keyMapping.length; i++)
+			for (int i = 0; i < InputHandler.keyMapping.length; i++) {
 				//if (InputHandler.keyMapping[i] == androidKeyCode)
 				if (InputHandler.keyMapping[i] == iKeyCodeWithDeviceId)
 					InputHandler.keyMapping[i] = -1;
+			}
 			
 		   //InputHandler.keyMapping[(playerIndex * emulatorInputLabels.length)+ emulatorInputIndex] = androidKeyCode;
 		   InputHandler.keyMapping[(playerIndex * emulatorInputLabels.length)+ emulatorInputIndex] = iKeyCodeWithDeviceId;

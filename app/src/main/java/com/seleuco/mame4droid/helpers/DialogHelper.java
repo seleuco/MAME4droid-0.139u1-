@@ -175,8 +175,12 @@ public class DialogHelper {
                             public void onClick(DialogInterface dialog, int id) {
                                 DialogHelper.savedDialog = DIALOG_NONE;
                                 mm.removeDialog(DIALOG_ROMs_DIR_SDK29);
-                                mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_NEW_INTERNAL);
+                                if(mm.getMainHelper().isAndroidTV())
+                                    mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_MEDIA_FOLDER);
+                                else
+                                    mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_FILES_DIR);
                                 mm.getPrefsHelper().setROMsDIR("");
+                                mm.getPrefsHelper().setSAF_Uri(null);
                                 mm.getPrefsHelper().setIsNotMigrated(false);
                                 mm.runMAME4droid();
                             }
@@ -190,17 +194,18 @@ public class DialogHelper {
                                     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
                                     mm.startActivityForResult(intent, MainHelper.REQUEST_CODE_OPEN_DIRECTORY);
                                     //throw new ActivityNotFoundException("TEST");
-                                }
-                                catch(ActivityNotFoundException e){
-                                    if(mm.getMainHelper().isAndroidTV() && Build.VERSION.SDK_INT <= 29 )
-                                    {
-                                        if(mm.CheckPermissions(true)) {
-                                            mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_NEW_INTERNAL);
+                                } catch (ActivityNotFoundException e) {
+                                    if (mm.getMainHelper().isAndroidTV() && Build.VERSION.SDK_INT <= 29) {
+                                        if (mm.CheckPermissions(true)) {
+                                            mm.getMainHelper().setInstallationDirType(MainHelper.INSTALLATION_DIR_FILES_DIR);
                                             mm.showDialog(DialogHelper.DIALOG_LOAD_FILE_EXPLORER);
                                         }
-                                    }
-                                    else {
-                                        mm.getDialogHelper().showMessage("Your device doesn't have the native android file manager needed to authorize external storage reading ... Debloated??",
+                                    } else {
+                                        String msg = "Your device doesn't have the native android file manager needed to authorize external storage reading.";
+                                        if (mm.getMainHelper().isAndroidTV())
+                                            msg += "\n\nSome Android TV devices don't include the OS document picker which is needed to grant folder permissions for the apps on Android 11+. As an alternative, select default which use the App Media Folder which is supported on all devices and is created at Android/media/[app package name]. Move any emulator files into that folder with a file manager so the app can access them without any special permissions.";
+
+                                        mm.getDialogHelper().showMessage(msg,
                                                 new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {

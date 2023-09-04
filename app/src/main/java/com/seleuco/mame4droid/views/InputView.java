@@ -205,8 +205,17 @@ public class InputView extends ImageView {
         int heightSize = 1;
 
         if (mm.getMainHelper().getscrOrientation() == Configuration.ORIENTATION_LANDSCAPE) {
-            widthSize = mm.getWindowManager().getDefaultDisplay().getWidth();
-            heightSize = mm.getWindowManager().getDefaultDisplay().getHeight();
+
+            /*if(!mm.getPrefsHelper().isNotchUsed())
+            {
+                widthSize = mm.getWindowManager().getDefaultDisplay().getWidth();
+                heightSize = mm.getWindowManager().getDefaultDisplay().getHeight();
+            }
+            else {*/
+                widthSize = MeasureSpec.getSize(widthMeasureSpec);
+                heightSize = MeasureSpec.getSize(heightMeasureSpec);
+            //}
+
         } else {
             int w = 1;//320;
             int h = 1;//240;

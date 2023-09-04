@@ -50,6 +50,7 @@ import android.net.Uri;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.provider.DocumentsContract;
+import android.util.Log;
 
 import com.seleuco.mame4droid.MAME4droid;
 
@@ -81,8 +82,14 @@ public class SAFHelper {
     }
 
     public String getNextDocumentName() {
-        if (fileNames == null) return null;
-        if (idxCurName >= fileNames.size()) return null;
+        if (fileNames == null)//safety
+        {
+            listUriFiles(true);
+        }
+        if (idxCurName >= fileNames.size()) {
+            idxCurName=0;//safety
+            return null;
+        }
         String name = fileNames.get(idxCurName);
         idxCurName++;
         return name;
@@ -91,7 +98,10 @@ public class SAFHelper {
     public int openRomUriFd(String pathName, String flags) {
         //System.out.println("openRomUriFd "+pathName+" "+flags);
 
-        if (fileIDs == null) return -1;
+        if (fileIDs == null) {//safety
+            //return -1;
+            listUriFiles(true);
+        }
 
         String fileid = null;
 
@@ -173,10 +183,15 @@ public class SAFHelper {
     public boolean listUriFiles(Boolean reload) {
         idxCurName = 0;
 
-        if (fileIDs != null && fileNames != null && !reload) return true;
+        if (fileIDs != null && fileNames != null && fileNames.size()!=0 && !reload) return true;
 
         fileIDs = new Hashtable<String, String>();
         fileNames = new ArrayList<String>();
+
+        if(uri==null){
+            Log.e("SAF","SAF URI NOT SET!!!");
+            return true;
+        }
 
         String id = DocumentsContract.getTreeDocumentId(uri);
         fileIDs.put("/", id);

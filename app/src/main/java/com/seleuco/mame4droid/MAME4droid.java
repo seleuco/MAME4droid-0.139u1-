@@ -157,6 +157,11 @@ public class MAME4droid extends Activity {
 
         safHelper = new SAFHelper(this);
 
+        if (getPrefsHelper().getSAF_Uri() != null) {
+            String uri = getPrefsHelper().getSAF_Uri();
+            safHelper.setURI(uri);
+        }
+
         fileExplore = new FileExplorer(this);
 
         netPlay = new NetPlay(this);
@@ -301,11 +306,6 @@ public class MAME4droid extends Activity {
 
         getMainHelper().copyFiles();
         getMainHelper().removeFiles();
-
-        if (getPrefsHelper().getSAF_Uri() != null) {
-            String uri = getPrefsHelper().getSAF_Uri();
-            getSAFHelper().setURI(uri);
-        }
 
         Emulator.emulate(mainHelper.getLibDir(), mainHelper.getInstallationDIR());
     }
