@@ -1164,7 +1164,7 @@ galaxy sde	   --> 2560x1600 16:10
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
-    public void checkNewViewIntent(Intent intent) {
+    public void checkNewViewIntent(Intent intent) {//TODO
         if (Intent.ACTION_VIEW.equals(intent.getAction()) && Emulator.isEmulating()) {
             Uri uri = intent.getData();
             java.io.File f = new java.io.File(uri.getPath());

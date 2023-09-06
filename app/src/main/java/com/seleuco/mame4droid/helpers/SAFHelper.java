@@ -74,7 +74,10 @@ public class SAFHelper {
     }
 
     public void setURI(String uriStr) {
-        uri = Uri.parse(uriStr);
+        if (uriStr == null)
+            uri = null;
+        else
+            uri = Uri.parse(uriStr);
     }
 
     public SAFHelper(MAME4droid value) {
@@ -87,7 +90,7 @@ public class SAFHelper {
             listUriFiles(true);
         }
         if (idxCurName >= fileNames.size()) {
-            idxCurName=0;//safety
+            idxCurName = 0;//safety
             return null;
         }
         String name = fileNames.get(idxCurName);
@@ -183,13 +186,13 @@ public class SAFHelper {
     public boolean listUriFiles(Boolean reload) {
         idxCurName = 0;
 
-        if (fileIDs != null && fileNames != null && fileNames.size()!=0 && !reload) return true;
+        if (fileIDs != null && fileNames != null && fileNames.size() != 0 && !reload) return true;
 
         fileIDs = new Hashtable<String, String>();
         fileNames = new ArrayList<String>();
 
-        if(uri==null){
-            Log.e("SAF","SAF URI NOT SET!!!");
+        if (uri == null) {
+            Log.e("SAF", "SAF URI NOT SET!!!");
             return true;
         }
 
@@ -278,14 +281,14 @@ public class SAFHelper {
 
         //for(String s : pathSegment) { System.out.println("path segment: " + s); }
 
-        if(pathSegment.size()<2)
+        if (pathSegment.size() < 2)
             return null;
 
         final String[] split = pathSegment.get(1).split(":");
 
         String tmp = null;
 
-        if(split.length==2) {
+        if (split.length == 2) {
 
             final StorageVolume vol = findVolume(split[0]);
             if (vol == null) {
@@ -310,13 +313,10 @@ public class SAFHelper {
             }
             if (tmp != null)
                 tmp += "/" + split[1];
-        }
-        else if(split.length==1)
-        {
-            if(!split[0].startsWith("/")) {
-                tmp = "/"+split[0];
-            }
-            else
+        } else if (split.length == 1) {
+            if (!split[0].startsWith("/")) {
+                tmp = "/" + split[0];
+            } else
                 tmp = split[0];
         }
 

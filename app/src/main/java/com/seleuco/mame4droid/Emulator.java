@@ -671,6 +671,7 @@ public class Emulator {
 
                     //String filePath = null;
 
+                    //android.os.Debug.waitForDebugger();
                     Log.d("", "URI = " + _uri);
                     try {
                         if (_uri != null && "content".equalsIgnoreCase(_uri.getScheme())) {
@@ -683,14 +684,19 @@ public class Emulator {
 							  fileName = f.getName();
 							  path = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf(File.separator));
 							  */
+                            mm.safHelper.setURI(null);//disable SAF.
                             fileName = mm.getMainHelper().getFileName(_uri);
                             String state = Environment.getExternalStorageState();
 
                             if (Environment.MEDIA_MOUNTED.equals(state)) {
-                                path = mm.getExternalCacheDir().getPath();
-                                java.io.InputStream input = mm.getContentResolver().openInputStream(_uri);
-                                error = mm.getMainHelper().copyFile(input, path, fileName);
-                                delete = true;
+                                //path = mm.getExternalCacheDir().getPath();
+                                path = mm.getPrefsHelper().getInstallationDIR()+"roms";
+                                File f = new File(path+"/"+fileName);
+                                if(!f.exists()) {
+                                    java.io.InputStream input = mm.getContentResolver().openInputStream(_uri);
+                                    error = mm.getMainHelper().copyFile(input, path, fileName);
+                                    delete = true;
+                                }
                             } else
                                 error = true;
                         } else {
@@ -800,6 +806,9 @@ public class Emulator {
         String romPath = mm.getPrefsHelper().getROMsDIR();
         if (pathName.startsWith(romPath))
             file = pathName.substring(romPath.length() + 1, pathName.length());
+
+        if(file.equals(""))
+            return -1;
 
         //System.out.println("File with path "+file);
 
