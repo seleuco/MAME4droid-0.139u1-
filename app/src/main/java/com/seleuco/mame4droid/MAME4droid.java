@@ -210,7 +210,10 @@ public class MAME4droid extends Activity {
                 if (res == false) {
                     this.getPrefsHelper().setInstallationDIR(this.getPrefsHelper().getOldInstallationDIR());//revert
                 } else {
-                    runMAME4droid();//MAIN ENTRY POINT
+                    if(Build.VERSION.SDK_INT >= 29 && !prefsHelper.getDontBotherMe())
+                    {
+                        showDialog(DialogHelper.DIALOG_NEW_MAME);
+                    } else  runMAME4droid();//MAIN ENTRY POINT
                 }
             }
             if (Objects.equals(getIntent().getAction(), Intent.ACTION_VIEW)) {

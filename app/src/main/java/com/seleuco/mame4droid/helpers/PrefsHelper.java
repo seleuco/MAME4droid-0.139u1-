@@ -58,6 +58,7 @@ import com.seleuco.mame4droid.input.InputHandler;
 import com.seleuco.mame4droid.prefs.GameFilterPrefs;/**/
 
 public class PrefsHelper implements OnSharedPreferenceChangeListener {
+    final static public String PREF_DONT_BOTHERME = "PREF_DONT_BOTHERME";
     final static public String PREF_ROMsDIR = "PREF_ROMsDIR_2";
     final static public String PREF_SAF_URI = "PREF_SAF_URI";
     final static public String PREF_INSTALLATION_DIR = "PREF_INSTALLATION_DIR";
@@ -544,6 +545,16 @@ public class PrefsHelper implements OnSharedPreferenceChangeListener {
     public void setOldInstallationDIR(String value) {
         SharedPreferences.Editor editor = getSharedPreferences().edit();
         editor.putString(PREF_OLD_INSTALLATION_DIR, value);
+        editor.commit();
+    }
+
+    public boolean getDontBotherMe() {
+        return getSharedPreferences().getBoolean(PREF_DONT_BOTHERME, false);
+    }
+
+    public void setDontBotheMe(Boolean value) {
+        SharedPreferences.Editor editor = getSharedPreferences().edit();
+        editor.putBoolean(PREF_DONT_BOTHERME, value);
         editor.commit();
     }
 

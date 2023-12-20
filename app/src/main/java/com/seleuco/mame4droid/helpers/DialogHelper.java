@@ -73,6 +73,8 @@ public class DialogHelper {
     public final static int DIALOG_EMU_RESTART = 11;
     public final static int DIALOG_NO_PERMISSIONS = 12;
     public final static int DIALOG_ROMs_DIR_SDK29 = 13;
+    public final static int DIALOG_NEW_MAME = 14;
+
 
     protected MAME4droid mm = null;
 
@@ -383,6 +385,36 @@ public class DialogHelper {
                         });
                 dialog = builder.create();
                 break;
+            case DIALOG_NEW_MAME:
+
+                String msg =
+                        "Hi :) I have published a new version of MAME4droid based in the latest version of MAME on PC desktop 0.261. "+
+                                "It's not only emulates arcade machines but also game consoles and computer systems (like C64, ZX Spectrum)\n\n" +
+                        "This new MAME4droid requires very powerful devices because it emulates in a much more realistic way and also needs a different romset. That is, your roms from this version (0.139) will not work for the most part and you will have to use those from the MAME version 0.261."
+                        + "\n\nWith all that said, do you want to go to Google Play and download this new version of MAME4droid? You will still have the old one, don't worry :).\n\n";
+
+                builder.setMessage(msg)
+                        .setCancelable(false)
+                        .setPositiveButton("Yes, I want to download", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                DialogHelper.savedDialog = DIALOG_NONE;
+                                mm.removeDialog(DIALOG_NEW_MAME);
+                                mm.getMainHelper().gotoNewMAME();
+                                mm.runMAME4droid();
+                            }
+                        })
+                        .setNegativeButton("Don't bore me anymore", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                DialogHelper.savedDialog = DIALOG_NONE;
+                                mm.removeDialog(DIALOG_NEW_MAME);
+                                mm.getPrefsHelper().setDontBotheMe(true);
+                                mm.runMAME4droid();
+                            }
+                        });
+                dialog = builder.create();
+                break;
+
             default:
                 dialog = null;
         }
@@ -428,6 +460,8 @@ public class DialogHelper {
             Emulator.pause();
         } else if (id == DIALOG_NO_PERMISSIONS) {
             DialogHelper.savedDialog = DIALOG_NO_PERMISSIONS;
+        } else if (id == DIALOG_NEW_MAME) {
+            DialogHelper.savedDialog = DIALOG_NEW_MAME;
         }
 
     }
